@@ -1,0 +1,53 @@
+{
+  "checkpoint": "logs/tensorboard_logs/version_181/checkpoints/best_fad_epoch_59_fad_0.2879.ckpt",
+  "test_dir": "preprocessing/dataset/stem-gmd/valid/noisy1",
+  "clean_dir": "preprocessing/dataset/stem-gmd/valid/clean",
+  "output_base": "logs/velocity_sweep_v181",
+  "velocities": [
+    {
+      "velocity": 0,
+      "fad": 15.052656,
+      "enhanced_dir": "logs/velocity_sweep_v181/velocity_0"
+    },
+    {
+      "velocity": 1,
+      "fad": 14.930122,
+      "enhanced_dir": "logs/velocity_sweep_v181/velocity_1"
+    },
+    {
+      "velocity": 20,
+      "fad": 1.45304,
+      "enhanced_dir": "logs/velocity_sweep_v181/velocity_20"
+    },
+    {
+      "velocity": 40,
+      "fad": 0.628265,
+      "enhanced_dir": "logs/velocity_sweep_v181/velocity_40"
+    },
+    {
+      "velocity": 60,
+      "fad": 0.62716,
+      "enhanced_dir": "logs/velocity_sweep_v181/velocity_60"
+    },
+    {
+      "velocity": 80,
+      "fad": 0.607096,
+      "enhanced_dir": "logs/velocity_sweep_v181/velocity_80"
+    },
+    {
+      "velocity": 100,
+      "fad": 0.631502,
+      "enhanced_dir": "logs/velocity_sweep_v181/velocity_100"
+    },
+    {
+      "velocity": 127,
+      "fad": 0.628135,
+      "enhanced_dir": "logs/velocity_sweep_v181/velocity_127"
+    },
+    {
+      "velocity": "random",
+      "fad": 14.824064,
+      "enhanced_dir": "logs/velocity_sweep_v181/random_velocity"
+    }
+  ]
+}

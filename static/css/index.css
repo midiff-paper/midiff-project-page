@@ -1,0 +1,343 @@
+body {
+  font-family: 'Noto Sans', sans-serif;
+}
+
+/* Visualizer Container Styles */
+.visualizer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #28a745;
+  min-height: 200px;
+}
+
+.visualizer-container.cream {
+  background: linear-gradient(135deg, #fefefe 0%, #f8f9fa 100%);
+}
+
+.button-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #28a745;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 15px;
+}
+
+.button-circle:hover {
+  background: #218838;
+  transform: scale(1.05);
+}
+
+.button-circle svg {
+  fill: white;
+}
+
+#vizSample {
+  width: 100%;
+  height: 150px;
+  background: transparent;
+}
+
+.footer .icon-link {
+    font-size: 25px;
+    color: #000;
+}
+
+.link-block a {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.dnerf {
+  font-variant: small-caps;
+}
+
+
+.teaser .hero-body {
+  padding-top: 0;
+  padding-bottom: 3rem;
+}
+
+.teaser {
+  font-family: 'Google Sans', sans-serif;
+}
+
+
+.publication-title {
+}
+
+.publication-banner {
+  max-height: parent;
+
+}
+
+.publication-banner video {
+  position: relative;
+  left: auto;
+  top: auto;
+  transform: none;
+  object-fit: fit;
+}
+
+.publication-header .hero-body {
+}
+
+.publication-title {
+    font-family: 'Google Sans', sans-serif;
+}
+
+.publication-authors {
+    font-family: 'Google Sans', sans-serif;
+}
+
+.publication-venue {
+    color: #555;
+    width: fit-content;
+    font-weight: bold;
+}
+
+.publication-awards {
+    color: #ff3860;
+    width: fit-content;
+    font-weight: bolder;
+}
+
+.publication-authors {
+}
+
+.publication-authors a {
+   color: hsl(204, 86%, 53%) !important;
+}
+
+.publication-authors a:hover {
+    text-decoration: underline;
+}
+
+.author-block {
+  display: inline-block;
+}
+
+.publication-banner img {
+}
+
+.publication-authors {
+  /*color: #4286f4;*/
+}
+
+.publication-video {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%;
+
+    overflow: hidden;
+    border-radius: 10px !important;
+}
+
+.publication-video iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.publication-body img {
+}
+
+.results-carousel {
+  overflow: hidden;
+}
+
+.results-carousel .item {
+  margin: 5px;
+  overflow: hidden;
+  padding: 20px;
+  font-size: 0;
+}
+
+.results-carousel video {
+  margin: 0;
+}
+
+.slider-pagination .slider-page {
+  background: #000000;
+}
+
+.eql-cntrb { 
+  font-size: smaller;
+}
+
+/* Academic Paper Typography Improvements */
+
+/* Main content paragraphs */
+.content p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin-bottom: 1.2em;
+  font-weight: 400;
+  color: #2c3e50;
+}
+
+/* Abstract section styling */
+.content.has-text-justified {
+  max-width: 100%;
+  text-align: justify;
+}
+
+/* Section containers */
+.section .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* Column width adjustments for better readability */
+.column.is-four-fifths .content p {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin-bottom: 1.1em;
+}
+
+.column.is-6 .content p {
+  font-size: 1rem;
+  line-height: 1.65;
+  margin-bottom: 1em;
+}
+
+.column.is-10 .content p {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin-bottom: 1.1em;
+}
+
+/* Heading spacing improvements */
+.title.is-3 {
+  margin-bottom: 1.5rem !important;
+  margin-top: 2rem;
+}
+
+.title.is-4 {
+  margin-bottom: 1.2rem !important;
+  margin-top: 1.8rem;
+}
+
+.title.is-5 {
+  margin-bottom: 1rem !important;
+  margin-top: 1.5rem;
+}
+
+/* Section spacing */
+.columns.is-centered {
+  margin-bottom: 2rem;
+}
+
+/* Mathematical equations spacing */
+.content p[style*="text-align: center"] {
+  margin: 1.5em 0;
+  padding: 0.5em 0;
+}
+
+/* Figure captions */
+figcaption {
+  font-size: 0.9rem !important;
+  line-height: 1.4 !important;
+  margin-top: 0.8rem !important;
+  color: #666 !important;
+  font-style: italic;
+}
+
+/* Results section paragraphs */
+.section .container > p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 1.2em;
+  color: #2c3e50;
+}
+
+/* Conclusion section */
+.content.has-text-justified p {
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* Responsive Typography Adjustments */
+@media screen and (max-width: 768px) {
+  .content p {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1em;
+  }
+  
+  .column.is-four-fifths .content p,
+  .column.is-6 .content p,
+  .column.is-10 .content p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  
+  .title.is-3 {
+    font-size: 1.75rem !important;
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .title.is-4 {
+    font-size: 1.5rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .section .container {
+    padding: 1.5rem 1rem;
+  }
+  
+  .columns.is-centered {
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .content p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  
+  .title.is-3 {
+    font-size: 1.5rem !important;
+  }
+  
+  .title.is-4 {
+    font-size: 1.25rem !important;
+  }
+  
+  .section .container {
+    padding: 1rem 0.75rem;
+  }
+}
+
+/* Enhanced readability for academic text */
+.content {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Better spacing for mathematical equations */
+.content p[style*="text-align: center"] {
+  background: #f8f9fa;
+  border-radius: 4px;
+  padding: 1rem;
+  margin: 2rem 0;
+  border-left: 4px solid #007bff;
+}
+
+
+

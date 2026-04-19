@@ -1,0 +1,2051 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Meta tags for social media banners, these should be filled in appropriatly as they are your "business card" -->
+  <!-- Replace the content tag with appropriate information -->
+  <meta name="description" content="MiDiff: MIDI-Conditioned Diffusion Models for Drum Audio Enhancement">
+  <meta property="og:title" content="MiDiff: MIDI-Conditioned Diffusion Models for Drum Audio Enhancement"/>
+  <meta property="og:description" content="MiDiff: MIDI-Conditioned Diffusion Models for Drum Audio Enhancement"/>
+  <!-- Path to banner image, should be in the path listed below. Optimal dimenssions are 1200X630-->
+  <meta property="og:image" content="static/images/overview.PNG" />
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
+
+
+  <meta name="twitter:title" content="MiDiff: MIDI-Conditioned Diffusion Models for Drum Audio Enhancement">
+  <meta name="twitter:description" content="MiDiff: MIDI-Conditioned Diffusion Models for Drum Audio Enhancement">
+  <!-- Path to banner image, should be in the path listed below. Optimal dimenssions are 1200X600-->
+  <meta name="twitter:image" content="static/images/overview.PNG">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- Keywords for your paper to be indexed by-->
+  <meta name="keywords" content="Audio Denoising, Diffusion Models, CTC Loss">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+  <title>MiDiff: MIDI-Conditioned Diffusion Models for Drum Audio Enhancement</title>
+  <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+  rel="stylesheet">
+
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+
+  <style>
+    /* Publication-ready styling */
+    body {
+      font-family: 'Noto Sans', 'Google Sans', sans-serif;
+    }
+    
+    .publication-title {
+      font-family: 'Google Sans', 'Noto Sans', sans-serif;
+      font-weight: 600;
+    }
+    
+    .publication-authors {
+      margin-bottom: 0.5rem;
+    }
+    
+    .publication-authors a {
+      color: #363636;
+      text-decoration: none;
+    }
+    
+    .publication-authors a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Section spacing */
+    .section {
+      padding: 3rem 1.5rem;
+    }
+    
+    /* Figure styling */
+    figure {
+      margin: 1.5rem 0;
+    }
+    
+    figcaption {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 0.75rem;
+    }
+    
+    /* Force scrollbars to always be visible on spectrogram containers */
+    .spectrogram-scroll-container::-webkit-scrollbar {
+      height: 12px;
+    }
+    .spectrogram-scroll-container::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 6px;
+    }
+    .spectrogram-scroll-container::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 6px;
+    }
+    .spectrogram-scroll-container::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+    /* For Firefox */
+    .spectrogram-scroll-container {
+      scrollbar-width: auto;
+      scrollbar-color: #888 #f1f1f1;
+    }
+    /* Epoch card sizing */
+    .epoch-card {
+      width: 210px !important;
+      min-width: 210px !important;
+    }
+    
+    /* Equation styling */
+    .equation-block {
+      background: #f8f9fa;
+      border-left: 4px solid #007bff;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      text-align: center;
+      font-size: 1.15rem;
+    }
+    
+    /* BibTeX styling */
+    #BibTeX pre {
+      background: #f5f5f5;
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+    }
+    
+    #BibTeX code {
+      font-size: 0.85rem;
+    }
+    
+    /* Footer styling */
+    .footer {
+      padding: 3rem 1.5rem;
+      background-color: #f5f5f5;
+    }
+    
+    .footer .content p {
+      margin-bottom: 0.5rem;
+    }
+
+  </style>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script src="static/js/bulma-carousel.min.js"></script>
+  <script src="static/js/bulma-slider.min.js"></script>
+  <script src="static/js/index.js"></script>
+  <!-- SeeWav for audio waveform visualization -->
+  <script src="https://unpkg.com/seewav@1.0.0/dist/seewav.min.js"></script>
+  <!-- Chart.js for interactive graphs -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+  <!-- MIDI Player -->
+  <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.5.0"></script>
+  <!-- MathJax Configuration -->
+  <script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)']],
+      displayMath: [['\\[', '\\]']],
+      processEscapes: true,
+      processEnvironments: true
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+    }
+  };
+  </script>
+  <!-- MathJax Library (removed polyfill.io - deprecated and caused load issues) -->
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <!-- MIDI parsing library -->
+  <script src="https://cdn.jsdelivr.net/npm/midi-parser-js@4.0.4/dist/midi-parser.min.js"></script>
+  <!-- Backup MIDI parser -->
+  <script src="https://unpkg.com/midi-file@1.2.4/midi-file.js"></script>
+  <!-- Tone.js for audio synthesis -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.58/Tone.js"></script>
+  <!-- TensorFlow.js for Magenta -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/1.2.8/tf.min.js"></script>
+  <!-- Magenta.js core for Player -->
+  <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.9.0"></script>
+  <!-- D3.js for visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/d3@5.7.0/dist/d3.min.js"></script>
+  <!-- Web Audio API FFT implementation -->
+
+</head>
+<body>
+
+
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">MiDiff: MIDI-Conditioned Diffusion Models for Drum Audio Enhancement</h1>
+            <div class="is-size-5 publication-authors">
+              <!-- Anonymous submission: no author or affiliation identifiers -->
+              <span class="author-block">Anonymous author(s)</span>
+            </div>
+
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">Affiliation withheld for peer review</span>
+            </div>
+
+                  <div class="column has-text-centered">
+                    <div class="publication-links">
+                      <!-- Paper link -->
+                      <span class="link-block">
+                        <a href="#" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                          <span class="icon">
+                            <i class="fas fa-file-pdf"></i>
+                          </span>
+                          <span>Paper</span>
+                        </a>
+                      </span>
+
+                      <!-- Github link -->
+                      <span class="link-block">
+                        <a href="#" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                          <span class="icon">
+                            <i class="fab fa-github"></i>
+                          </span>
+                          <span>Code</span>
+                        </a>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+<section class="section">
+  <div class="container is-widescreen">
+
+    <!-- Abstract -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            We present MiDiff, a MIDI-conditioned diffusion model for drum audio enhancement that leverages symbolic musical information to guide the denoising process. Our method extends SGMSE by incorporating MIDI conditioning through three complementary strategies: early injection, Feature-wise Linear Modulation (FiLM), and cross-attention within the NCSN++ U-Net architecture. By integrating all three conditioning approaches in a single architecture, MiDiff leverages their complementary strengths to guide the enhancement process. Evaluation on drum audio datasets with (clean, noisy, MIDI) triplets demonstrates improved Fréchet Audio Distance and superior perceptual quality with better preservation of rhythmic structure compared to baseline models.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MIDI Conditioning Methods Section -->
+    <div class="columns is-centered" style="margin-top: 3rem;">
+      <div class="column is-four-fifths">
+        <h3 class="title is-4">MIDI Conditioning Methods</h3>
+        <div class="content has-text-justified">
+          <p>
+            We investigate three approaches: early injection, FiLM, and cross-attention. Empirical comparisons are in the ablation study.
+          </p>
+
+          <p>
+            <strong>Early Injection.</strong> \([\mathbf{x}_t, \mathbf{y}]\) and MIDI embeddings (from the piano roll via the encoder) are summed before feeding into the U-Net.
+          </p>
+
+          <p>
+            <strong>FiLM.</strong> We employ FiLM layers with scaling/shifting parameters:
+          </p>
+          <p style="text-align: center; background: #f8f9fa; border-left: 4px solid #007bff; padding: 1.5rem; margin: 2rem 0; font-size: 1.15rem;">
+            \[\gamma_{i,c} = f_c(\mathbf{m}_i), \quad \beta_{i,c} = h_c(\mathbf{m}_i), \quad \text{FiLM}(F_{i,c}|\gamma_{i,c}, \beta_{i,c}) = \gamma_{i,c}F_{i,c} + \beta_{i,c}\]
+          </p>
+          <p>
+            A single <em>FiLM generator</em> outputs \((\boldsymbol{\gamma}_{i}, \boldsymbol{\beta}_{i})\) from \(\mathbf{m}_i\). FiLM blocks follow each ResNet block, enabling hierarchical modulation. We retained frame-wise FiLM over Temporal FiLM for lower FAD.
+          </p>
+
+          <p>
+            <strong>Cross-Attention.</strong> Spectral features attend to MIDI embeddings as keys/values. A cross-attention block is inserted before every self-attention layer.
+          </p>
+
+          <p>
+            <strong>MiDiff</strong> integrates all three strategies within a single architecture.
+          </p>
+        </div>
+
+        <figure style="margin-top: 2rem;">
+          <div style="width: 100%; overflow-x: auto; background: linear-gradient(180deg, #fafbfc 0%, #f6f8fa 100%); border-radius: 12px; padding: 2rem; border: 1px solid #e1e4e8;">
+            <svg viewBox="0 0 900 320" style="width: 100%; height: auto; min-height: 280px;" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MIDI conditioning methods: Early injection, FiLM, and Cross-attention">
+              <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                  <polygon points="0 0, 10 3.5, 0 7" fill="#37474f"/>
+                </marker>
+                <linearGradient id="blueFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e3f2fd"/><stop offset="100%" stop-color="#bbdefb"/></linearGradient>
+                <linearGradient id="orangeFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffe0b2"/><stop offset="100%" stop-color="#ffcc80"/></linearGradient>
+                <linearGradient id="cyanFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#b2ebf2"/><stop offset="100%" stop-color="#80deea"/></linearGradient>
+                <linearGradient id="purpleFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e1bee7"/><stop offset="100%" stop-color="#ce93d8"/></linearGradient>
+                <linearGradient id="greenFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#c8e6c9"/><stop offset="100%" stop-color="#a5d6a7"/></linearGradient>
+                <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="1" stdDeviation="1" flood-opacity="0.08"/>
+                </filter>
+              </defs>
+              <style>
+                .fig-title { font: 600 14px 'Google Sans', 'Noto Sans', sans-serif; fill: #1a1a2e; }
+                .fig-label { font: 500 13px 'Google Sans', 'Noto Sans', sans-serif; fill: #37474f; }
+                .fig-box { font: 500 11px 'Google Sans', 'Noto Sans', sans-serif; fill: #263238; }
+                .fig-math { font: 600 13px 'Google Sans', 'Noto Sans', sans-serif; fill: #1a1a2e; font-style: italic; }
+              </style>
+              <!-- Column headers -->
+              <text x="150" y="12" class="fig-title" text-anchor="middle">Early Injection</text>
+              <text x="450" y="12" class="fig-title" text-anchor="middle">FiLM</text>
+              <text x="750" y="12" class="fig-title" text-anchor="middle">Cross-Attention</text>
+              <!-- Vertical dividers -->
+              <line x1="300" y1="40" x2="300" y2="300" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4,4"/>
+              <line x1="600" y1="40" x2="600" y2="300" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4,4"/>
+              <!-- Panel 1: Early Injection -->
+              <g transform="translate(50, 55)">
+                <text x="47" y="-8" class="fig-math">m</text>
+                <foreignObject x="110" y="-25" width="80" height="28">
+                  <div xmlns="http://www.w3.org/1999/xhtml" style="font-size: 13px; color: #1a1a2e; text-align: center;">\([\mathbf{x}_t, \mathbf{y}]\)</div>
+                </foreignObject>
+                <rect x="10" y="35" width="85" height="32" rx="4" fill="url(#orangeFill)" stroke="#37474f" stroke-width="1.2" filter="url(#softShadow)"/>
+                <text x="52" y="50" class="fig-box" text-anchor="middle">MIDI</text>
+                <text x="52" y="60" class="fig-box" text-anchor="middle">Encoder</text>
+                <circle cx="100" cy="95" r="14" fill="url(#greenFill)" stroke="#37474f" stroke-width="1.2" filter="url(#softShadow)"/>
+                <text x="100" y="99" class="fig-box" text-anchor="middle" font-size="14">+</text>
+                <rect x="55" y="145" width="90" height="36" rx="4" fill="url(#blueFill)" stroke="#37474f" stroke-width="1.2" filter="url(#softShadow)"/>
+                <text x="100" y="167" class="fig-box" text-anchor="middle">U-Net</text>
+                <text x="95" y="230" class="fig-math">h</text>
+                <!-- Arrows -->
+                <path d="M 52 0 L 52 35" stroke="#37474f" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+                <path d="M 52 67 L 52 95 L 86 95" stroke="#37474f" stroke-width="1.5" fill="none" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+                <path d="M 150 0 L 150 95 L 114 95" stroke="#37474f" stroke-width="1.5" fill="none" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+                <line x1="100" y1="109" x2="100" y2="145" stroke="#37474f" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+                <line x1="100" y1="181" x2="100" y2="215" stroke="#37474f" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+              </g>
+              <!-- Panel 2: FiLM -->
+              <g transform="translate(350, 55)">
+                <text x="36" y="-8" class="fig-math">m</text>
+                <text x="165" y="-8" class="fig-math">h</text>
+                <rect x="0" y="25" width="85" height="32" rx="4" fill="url(#orangeFill)" stroke="#37474f" stroke-width="1.2" filter="url(#softShadow)"/>
+                <text x="42" y="40" class="fig-box" text-anchor="middle">MIDI</text>
+                <text x="42" y="50" class="fig-box" text-anchor="middle">Encoder</text>
+                <rect x="0" y="95" width="85" height="32" rx="4" fill="url(#cyanFill)" stroke="#37474f" stroke-width="1.2" filter="url(#softShadow)"/>
+                <text x="42" y="110" class="fig-box" text-anchor="middle">Temporal</text>
+                <text x="42" y="120" class="fig-box" text-anchor="middle">Alignment</text>
+                <rect x="120" y="25" width="90" height="32" rx="4" fill="url(#blueFill)" stroke="#37474f" stroke-width="1.2" filter="url(#softShadow)"/>
+                <text x="165" y="45" class="fig-box" text-anchor="middle">ResBlock</text>
+                <rect x="120" y="95" width="90" height="32" rx="4" fill="url(#purpleFill)" stroke="#37474f" stroke-width="1.2" filter="url(#softShadow)"/>
+                <text x="165" y="112" class="fig-box" text-anchor="middle">FiLM</text>
+                <text x="162" y="180" class="fig-math">h</text>
+                <!-- MIDI flow (left): m -> Encoder -> Temporal -> FiLM -->
+                <line x1="42" y1="0" x2="42" y2="25" stroke="#37474f" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+                <line x1="42" y1="57" x2="42" y2="95" stroke="#37474f" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+                <path d="M 85 111 L 120 111" stroke="#37474f" stroke-width="1.5" fill="none" marker-end="url(#arrowhead)"/>
+                <!-- Main flow (right): h -> ResBlock -> FiLM -> h -->
+                <line x1="165" y1="0" x2="165" y2="25" stroke="#37474f" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+                <line x1="165" y1="57" x2="165" y2="95" stroke="#37474f" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+                <line x1="165" y1="127" x2="165" y2="165" stroke="#37474f" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+              </g>
+              <!-- Panel 3: Cross-Attention -->
+              <g transform="translate(650, 55)">
+                <text x="38" y="-8" class="fig-math">m</text>
+                <text x="162" y="-8" class="fig-math">h</text>
+                <rect x="0" y="25" width="85" height="32" rx="4" fill="url(#orangeFill)" stroke="#37474f" stroke-width="1.2" filter="url(#softShadow)"/>
+                <text x="42" y="40" class="fig-box" text-anchor="middle">MIDI</text>
+                <text x="42" y="50" class="fig-box" text-anchor="middle">Encoder</text>
+                <rect x="0" y="80" width="85" height="32" rx="4" fill="url(#cyanFill)" stroke="#37474f" stroke-width="1.2" filter="url(#softShadow)"/>
+                <text x="42" y="95" class="fig-box" text-anchor="middle">Temporal</text>
+                <text x="42" y="105" class="fig-box" text-anchor="middle">Alignment</text>
+                <rect x="120" y="25" width="90" height="32" rx="4" fill="url(#blueFill)" stroke="#37474f" stroke-width="1.2" filter="url(#softShadow)"/>
+                <text x="165" y="45" class="fig-box" text-anchor="middle">ResBlock</text>
+                <rect x="120" y="80" width="90" height="32" rx="4" fill="url(#orangeFill)" stroke="#37474f" stroke-width="1.2" filter="url(#softShadow)"/>
+                <text x="165" y="102" class="fig-box" text-anchor="middle">Self-Attn</text>
+                <rect x="120" y="136" width="90" height="32" rx="4" fill="url(#purpleFill)" stroke="#37474f" stroke-width="1.2" filter="url(#softShadow)"/>
+                <text x="165" y="152" class="fig-box" text-anchor="middle">Cross</text>
+                <text x="165" y="162" class="fig-box" text-anchor="middle">Attention</text>
+                <rect x="120" y="190" width="90" height="32" rx="4" fill="url(#blueFill)" stroke="#37474f" stroke-width="1.2" filter="url(#softShadow)"/>
+                <text x="165" y="207" class="fig-box" text-anchor="middle">ResBlock</text>
+                <text x="160" y="260" class="fig-math">h</text>
+                <!-- MIDI flow (left): m -> Encoder -> Temporal -> Cross-Attention -->
+                <line x1="42" y1="0" x2="42" y2="24" stroke="#37474f" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+                <line x1="42" y1="57" x2="42" y2="79" stroke="#37474f" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+                <path d="M 40 112 L 40 152 L 120 152" stroke="#37474f" stroke-width="1.5" fill="none" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+                <!-- Main flow (right): h -> ResBlock -> Self-Attn -> Cross-Attention -> ResBlock -> h -->
+                <line x1="165" y1="0" x2="165" y2="24" stroke="#37474f" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+                <line x1="165" y1="57" x2="165" y2="79" stroke="#37474f" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+                <line x1="165" y1="112" x2="165" y2="135" stroke="#37474f" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+                <line x1="165" y1="168" x2="165" y2="190" stroke="#37474f" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+                <line x1="165" y1="222" x2="165" y2="245" stroke="#37474f" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+              </g>
+            </svg>
+          </div>
+          <figcaption class="" style="text-align: center; margin-top: 1rem;">
+            <strong>Figure 1:</strong> MIDI conditioning methods: Early injection, FiLM, and Cross-attention.
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <!-- Dataset Section -->
+    <div class="columns is-centered" style="margin-top: 3rem;">
+      <div class="column is-four-fifths">
+        <h3 class="title is-3">Dataset</h3>
+        <div class="content has-text-justified">
+          <p>
+            Our training dataset consists of triplets containing (clean, noisy, MIDI) samples for drum audio enhancement. The clean audio serves as ground truth, noisy versions simulate realistic degradation scenarios, and MIDI data provides symbolic musical context including note onsets, velocities, and timing information.
+          </p>
+          <p>
+            This multimodal structure enables the model to learn relationships between symbolic musical information and audio quality, allowing for musically-informed enhancement decisions. The MIDI component serves as a strong conditioning signal, providing explicit knowledge about drum patterns and timing for the enhancement process.
+          </p>
+            <p>The following samples provide a direct perceptual comparison. The "Clean Original" and "Noisy Input" are provided as references.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+    </div>
+    
+    <!-- Clean, Noisy, and MIDI Reference in One Line -->
+    <div class="columns is-centered" style="margin-bottom: 30px;">
+      <!-- Clean Audio Reference -->
+      <div class="column is-4">
+        <div class="box" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border: 2px solid #dee2e6; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
+          <div class="level is-mobile" style="margin-bottom: 15px;">
+            <div class="level-left">
+              <div class="level-item">
+                <h4 class="title is-6" style="color: #2c3e50; margin-bottom: 0;">
+                  <span class="icon" style="color: #27ae60;">
+                    <i class="fas fa-music"></i>
+                  </span>
+                  Clean Reference Audio
+                </h4>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Compact Spectrogram visualization -->
+          <div class="spectrogram-scroll-container" style="margin-bottom: 15px; display: flex; justify-content: flex-start; border: 2px solid #dee2e6; border-radius: 8px; overflow-x: scroll; overflow-y: hidden; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.3); height: 270px; cursor: grab;">
+            <img src="static/images/spec_clean.png" alt="Clean Audio Spectrogram" style="height: 265px; width: auto; display: inline-block; max-width: none;">
+          </div>
+          
+          <div class="field">
+            <div class="control">
+              <audio id="audio-clean" controls style="width: 100%; height: 40px;">
+                <source src="static/audio/dataset/clean/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav" type="audio/wav">
+                Your browser does not support the audio element.
+              </audio>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Noisy Audio Reference -->
+      <div class="column is-4">
+        <div class="box" style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border: 2px solid #ffc107; border-radius: 12px; box-shadow: 0 8px 25px rgba(255,193,7,0.2);">
+          <div class="level is-mobile" style="margin-bottom: 15px;">
+            <div class="level-left">
+              <div class="level-item">
+                <h4 class="title is-6" style="color: #856404; margin-bottom: 0;">
+                  <span class="icon" style="color: #f39c12;">
+                    <i class="fas fa-music"></i>
+                  </span>
+                  Noisy Input Audio
+                </h4>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Compact Spectrogram visualization -->
+          <div class="spectrogram-scroll-container" style="margin-bottom: 15px; display: flex; justify-content: flex-start; border: 2px solid #ffc107; border-radius: 8px; overflow-x: scroll; overflow-y: hidden; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.3); height: 270px; cursor: grab;">
+            <img src="static/images/spec_noisy.png" alt="Noisy Audio Spectrogram" style="height: 265px; width: auto; display: inline-block; max-width: none;">
+          </div>
+          
+          <div class="field">
+            <div class="control">
+              <audio id="audio-noisy" controls style="width: 100%; height: 40px;">
+                <source src="static/audio/dataset/noisy/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav" type="audio/wav">
+                Your browser does not support the audio element.
+              </audio>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MIDI Input File -->
+      <div class="column is-4">
+        <div class="box" style="background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%); border: 2px solid #28a745; border-radius: 12px; box-shadow: 0 8px 25px rgba(40,167,69,0.2);">
+          <div class="level is-mobile" style="margin-bottom: 15px;">
+            <div class="level-left">
+              <div class="level-item">
+                <h4 class="title is-6" style="color: #155724; margin-bottom: 0;">
+                  <span class="icon" style="color: #28a745;">
+                    <i class="fas fa-file-audio"></i>
+                  </span>
+                  Condition - MIDI Input File
+                </h4>
+              </div>
+            </div>
+          </div>
+          
+          <!-- MIDI Piano Roll Visualization (Canvas) -->
+          <div style="margin-bottom: 15px; display: flex; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: #E8E8E8; overflow: hidden;">
+            <!-- Drum labels on the left -->
+            <canvas id="drum-labels-canvas" style="display: block; height: 265px; width: 85px; border-right: 1px solid rgba(0, 0, 0, 0.1);"></canvas>
+            <!-- Scrollable piano roll -->
+            <div id="piano-roll-container" style="overflow-x: auto; flex: 1; position: relative;">
+              <canvas id="piano-roll-canvas" style="display: block; height: 265px;"></canvas>
+            </div>
+          </div>
+          
+          <!-- MIDI Player -->
+          <div class="field">
+            <div class="control">
+              <midi-player
+                id="midi-player-main"
+                src="static/audio/dataset/midi/1_funk-groove1_138_beat_4-4.mid"
+                sound-font
+                visualizer="#midi-visualizer"
+                style="width: 100%; border-radius: 8px; display: block; margin: 0; padding: 0;">
+              </midi-player>
+            </div>
+          </div>
+          
+          <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.28/build/Midi.js"></script>
+          <script>
+            // Real-time MIDI Piano Roll Visualization
+            (async function() {
+              const player = document.getElementById('midi-player-main');
+              const container = document.getElementById('piano-roll-container');
+              const canvas = document.getElementById('piano-roll-canvas');
+              const ctx = canvas.getContext('2d');
+              const labelsCanvas = document.getElementById('drum-labels-canvas');
+              const labelsCtx = labelsCanvas.getContext('2d');
+              
+              // Custom drum map for this specific MIDI file (9 drums)
+              const drumNames = {
+                36: 'Bass',
+                38: 'Snare',
+                42: 'HH Close',
+                46: 'HH Open',
+                43: 'Floor Tom',
+                47: 'Mid Tom',
+                48: 'High Tom',
+                49: 'Crash',
+                51: 'Ride'
+              };
+              
+              let midiData = null;
+              let allNotes = [];
+              let duration = 0;
+              // Use only the actual pitches present in the MIDI (9 drums)
+              const usedPitches = [36, 38, 42, 46, 43, 47, 48, 49, 51]; // Bass, Snare, HH Close, HH Open, Floor Tom, Mid Tom, High Tom, Crash, Ride
+              const pixelsPerSecond = 50; // Scale: 50px per second (more notes visible)
+              
+              // Set label canvas size
+              labelsCanvas.width = 85;
+              labelsCanvas.height = 265; // Balanced height for visualization
+              
+              // Load and parse MIDI file
+              try {
+                const response = await fetch('static/10_soul-groove10_102_beat_4-4.mid');
+                const arrayBuffer = await response.arrayBuffer();
+                midiData = await Midi.fromUrl('static/audio/dataset/midi/1_funk-groove1_138_beat_4-4.mid');
+                
+                // Extract all notes from all tracks
+                midiData.tracks.forEach(track => {
+                  track.notes.forEach(note => {
+                    allNotes.push({
+                      pitch: note.midi,
+                      start: note.time,
+                      end: note.time + note.duration,
+                      velocity: note.velocity
+                    });
+                  });
+                });
+                
+                duration = midiData.duration;
+                
+                // Debug: Show all unique pitches
+                const uniquePitches = [...new Set(allNotes.map(n => n.pitch))].sort((a, b) => a - b);
+                console.log(`Loaded MIDI: ${allNotes.length} notes, duration: ${duration}s`);
+                console.log(`Unique pitches in MIDI:`, uniquePitches);
+                console.log(`Using pitch mapping:`, usedPitches);
+                
+                // Set canvas size
+                const canvasWidth = duration * pixelsPerSecond;
+                canvas.width = canvasWidth;
+                canvas.height = 265; // Balanced height for visualization
+                
+                // Initial draw
+                drawPianoRoll(0);
+                drawDrumLabels();
+                
+                // Animation loop for cursor and scrolling
+                function animate() {
+                  if (player.playing) {
+                    const currentTime = player.currentTime || 0;
+                    drawPianoRoll(currentTime);
+                    
+                    // Auto-scroll to keep cursor centered
+                    const cursorX = currentTime * pixelsPerSecond;
+                    const containerWidth = container.offsetWidth;
+                    container.scrollLeft = cursorX - (containerWidth / 2);
+                  }
+                  requestAnimationFrame(animate);
+                }
+                animate();
+                
+              } catch (error) {
+                console.error('Error loading MIDI:', error);
+                ctx.fillStyle = '#28a745';
+                ctx.font = '16px sans-serif';
+                ctx.fillText('Error loading MIDI file', 10, 150);
+              }
+              
+              function drawPianoRoll(currentTime) {
+                // Clear canvas with light gray background
+                ctx.fillStyle = '#E8E8E8';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                const numPitches = usedPitches.length; // 6 pitches
+                const pitchHeight = canvas.height / numPitches;
+                
+                // Draw alternating row backgrounds for better readability
+                usedPitches.forEach((pitch, index) => {
+                  if (index % 2 === 0) {
+                    const y = canvas.height - ((index + 1) * pitchHeight);
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.03)';
+                    ctx.fillRect(0, y, canvas.width, pitchHeight);
+                  }
+                });
+                
+                // Draw enhanced grid lines
+                ctx.strokeStyle = 'rgba(40, 167, 69, 0.15)';
+                ctx.lineWidth = 0.5;
+                
+                // Vertical grid lines (every second) with stronger lines every 4 seconds
+                for (let t = 0; t <= duration; t += 1) {
+                  const x = t * pixelsPerSecond;
+                  if (t % 4 === 0) {
+                    ctx.strokeStyle = 'rgba(40, 167, 69, 0.25)';
+                    ctx.lineWidth = 1;
+                  } else {
+                    ctx.strokeStyle = 'rgba(40, 167, 69, 0.1)';
+                    ctx.lineWidth = 0.5;
+                  }
+                  ctx.beginPath();
+                  ctx.moveTo(x, 0);
+                  ctx.lineTo(x, canvas.height);
+                  ctx.stroke();
+                }
+                
+                // Horizontal grid lines between each drum
+                ctx.strokeStyle = 'rgba(40, 167, 69, 0.1)';
+                ctx.lineWidth = 0.5;
+                for (let i = 0; i <= numPitches; i++) {
+                  const y = canvas.height - (i * pitchHeight);
+                  ctx.beginPath();
+                  ctx.moveTo(0, y);
+                  ctx.lineTo(canvas.width, y);
+                  ctx.stroke();
+                }
+                
+                // Draw all notes with drum-specific color palette
+                allNotes.forEach(note => {
+                  // Find the index of this pitch in our used pitches
+                  const pitchIndex = usedPitches.indexOf(note.pitch);
+                  if (pitchIndex === -1) return; // Skip notes not in our list
+                  
+                  const x = note.start * pixelsPerSecond;
+                  const width = Math.max((note.end - note.start) * pixelsPerSecond, 2);
+                  const y = canvas.height - ((pitchIndex + 1) * pitchHeight);
+                  const height = pitchHeight * 0.85;
+                  
+                  // Drum-specific color palette - soft pastel colors
+                  const drumColors = {
+                    36: { r: 126, g: 200, b: 227, name: 'Sky Blue' },         // Bass/Kick
+                    38: { r: 255, g: 166, b: 158, name: 'Salmon' },           // Snare
+                    42: { r: 162, g: 210, b: 255, name: 'Aqua' },             // Hi-Hat Closed
+                    46: { r: 184, g: 242, b: 230, name: 'Mint' },             // Hi-Hat Open
+                    43: { r: 160, g: 206, b: 217, name: 'Teal' },             // Floor Tom (Low Tom)
+                    47: { r: 224, g: 187, b: 228, name: 'Lilac' },            // Mid Tom
+                    48: { r: 255, g: 218, b: 193, name: 'Peach' },            // High Tom
+                    49: { r: 253, g: 253, b: 150, name: 'Light Yellow' },     // Crash
+                    51: { r: 203, g: 170, b: 203, name: 'Lavender' }          // Ride
+                  };
+                  
+                  const velocity = note.velocity;
+                  const isPlaying = currentTime >= note.start && currentTime <= note.end;
+                  
+                  // Get base color for this drum
+                  const baseColor = drumColors[note.pitch] || { r: 100, g: 100, b: 100 };
+                  
+                  // Adjust brightness and alpha based on velocity
+                  const velocityFactor = 0.4 + (velocity * 0.6); // Range from 40% to 100%
+                  const r = Math.floor(baseColor.r * velocityFactor);
+                  const g = Math.floor(baseColor.g * velocityFactor);
+                  const b = Math.floor(baseColor.b * velocityFactor);
+                  const alpha = 0.6 + (velocity * 0.4); // Range from 0.6 to 1.0
+                  
+                  if (isPlaying) {
+                    // Highlight currently playing notes with intense glow
+                    const glowIntensity = 10 + velocity * 15; // Stronger glow for louder notes
+                    ctx.shadowBlur = glowIntensity;
+                    ctx.shadowColor = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, ${Math.min(alpha + 0.4, 1)})`;
+                    
+                    // Brighter color when playing (use full base color)
+                    const playR = Math.min(255, baseColor.r + 40);
+                    const playG = Math.min(255, baseColor.g + 40);
+                    const playB = Math.min(255, baseColor.b + 40);
+                    
+                    const playGradient = ctx.createLinearGradient(x, y, x, y + height);
+                    playGradient.addColorStop(0, `rgba(${playR}, ${playG}, ${playB}, ${Math.min(alpha + 0.3, 1)})`);
+                    playGradient.addColorStop(1, `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, ${alpha})`);
+                    ctx.fillStyle = playGradient;
+                    ctx.strokeStyle = `rgba(${playR}, ${playG}, ${playB}, 1)`;
+                    ctx.lineWidth = 1.5 + velocity;
+                  } else {
+                    ctx.shadowBlur = 0;
+                    
+                    // Create velocity-based gradient for notes
+                    const noteGradient = ctx.createLinearGradient(x, y, x, y + height);
+                    noteGradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${alpha})`);
+                    noteGradient.addColorStop(1, `rgba(${Math.floor(r * 0.7)}, ${Math.floor(g * 0.7)}, ${Math.floor(b * 0.7)}, ${alpha * 0.8})`);
+                    ctx.fillStyle = noteGradient;
+                    ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${alpha * 0.9})`;
+                    ctx.lineWidth = 0.5 + velocity * 0.5;
+                  }
+                  
+                  // Draw rounded rectangle for notes
+                  const radius = Math.min(2, height / 4);
+                  ctx.beginPath();
+                  ctx.roundRect(x, y, width, height, radius);
+                  ctx.fill();
+                  ctx.stroke();
+                  ctx.shadowBlur = 0;
+                });
+                
+                // Draw playback cursor with enhanced styling
+                if (player.playing) {
+                  const cursorX = currentTime * pixelsPerSecond;
+                  
+                  // Draw glow effect
+                  ctx.shadowBlur = 10;
+                  ctx.shadowColor = 'rgba(255, 100, 100, 0.6)';
+                  
+                  // Draw cursor line with gradient
+                  const cursorGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                  cursorGradient.addColorStop(0, 'rgba(255, 50, 50, 0.9)');
+                  cursorGradient.addColorStop(0.5, 'rgba(255, 80, 80, 1)');
+                  cursorGradient.addColorStop(1, 'rgba(255, 50, 50, 0.9)');
+                  ctx.strokeStyle = cursorGradient;
+                  ctx.lineWidth = 3;
+                  ctx.beginPath();
+                  ctx.moveTo(cursorX, 0);
+                  ctx.lineTo(cursorX, canvas.height);
+                  ctx.stroke();
+                  ctx.shadowBlur = 0;
+                  
+                  // Draw time label with background
+                  const timeText = `${currentTime.toFixed(1)}s`;
+                  ctx.font = 'bold 11px sans-serif';
+                  const textWidth = ctx.measureText(timeText).width;
+                  
+                  // Background for time label
+                  ctx.fillStyle = 'rgba(255, 50, 50, 0.9)';
+                  ctx.fillRect(cursorX + 3, 8, textWidth + 8, 16);
+                  
+                  // Time text
+                  ctx.fillStyle = '#ffffff';
+                  ctx.fillText(timeText, cursorX + 7, 19);
+                }
+              }
+              
+              function drawDrumLabels() {
+                // Clear labels canvas with light gray background
+                labelsCtx.fillStyle = '#E8E8E8';
+                labelsCtx.fillRect(0, 0, labelsCanvas.width, labelsCanvas.height);
+                
+                const numPitches = usedPitches.length; // 6 pitches
+                const pitchHeight = labelsCanvas.height / numPitches;
+                
+                // Draw alternating row backgrounds
+                usedPitches.forEach((pitch, index) => {
+                  if (index % 2 === 0) {
+                    const y = labelsCanvas.height - ((index + 1) * pitchHeight);
+                    labelsCtx.fillStyle = 'rgba(0, 0, 0, 0.03)';
+                    labelsCtx.fillRect(0, y, labelsCanvas.width, pitchHeight);
+                  }
+                });
+                
+                labelsCtx.font = 'bold 10px sans-serif';
+                labelsCtx.textAlign = 'right';
+                labelsCtx.textBaseline = 'middle';
+                
+                usedPitches.forEach((pitch, index) => {
+                  const y = labelsCanvas.height - ((index + 0.5) * pitchHeight);
+                  
+                  // Determine label text
+                  let label = drumNames[pitch] || `${pitch}`;
+                  
+                  // Draw subtle horizontal line
+                  labelsCtx.strokeStyle = 'rgba(40, 167, 69, 0.15)';
+                  labelsCtx.lineWidth = 0.5;
+                  labelsCtx.beginPath();
+                  labelsCtx.moveTo(0, y);
+                  labelsCtx.lineTo(labelsCanvas.width, y);
+                  labelsCtx.stroke();
+                  
+                  // Draw label text with subtle shadow for better readability
+                  labelsCtx.shadowBlur = 2;
+                  labelsCtx.shadowColor = 'rgba(255, 255, 255, 0.5)';
+                  labelsCtx.fillStyle = '#000000';
+                  labelsCtx.fillText(label, labelsCanvas.width - 4, y);
+                  labelsCtx.shadowBlur = 0;
+                });
+              }
+            })();
+          </script>
+          
+          <!-- <div class="field">
+            <div class="control">
+              <a href="static/10_soul-groove10_102_beat_4-4.mid" download class="button is-success is-fullwidth">
+                <span class="icon">
+                  <i class="fas fa-download"></i>
+                </span>
+                <span>Download MIDI</span>
+              </a>
+            </div>
+          </div> -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="columns is-centered" style="margin-top: 3rem;">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Results</h2>
+        <div class="content">
+          <p>To quantitatively evaluate performance, we calculated standard audio quality metrics. The Frechet VGGish Score measures the similarity between distributions of embeddings from the generated audio and the ground truth clean audio. <strong>A lower score indicates higher similarity to the clean audio.</strong></p>
+        </div>
+        
+        <figure style="margin-top: 2rem;">
+          <div style="position: relative; width: 100%; height: 400px; margin: 20px 0;">
+            <div style="position: absolute; top: 10px; right: 10px; z-index: 10; background: white; padding: 8px 12px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid #e0e0e0;">
+              <label class="checkbox" style="margin: 0; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.9rem; color: #4a4a4a;">
+                <input type="checkbox" id="logScaleToggle" onchange="toggleLogScale()" checked style="cursor: pointer;">
+                <span>Log Scale</span>
+              </label>
+            </div>
+            <canvas id="frechetChart"></canvas>
+          </div>
+          <figcaption style="text-align: center;"><strong>Figure 3:</strong> Interactive Frechet VGGish Score vs. Epochs for Baseline vs. Midi Conditioned models.</figcaption>
+        </figure>
+        
+      </div>
+    </div>
+
+    <div class="columns is-centered" style="margin-top: 3rem;">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Audio Samples</h2>
+        <p class="content has-text-justified" style="margin-bottom: 1.5rem;">Compare the audio outputs of our baseline model and MIDI-conditioned model across different training epochs. Use the interactive tool below to select any two outputs for side-by-side comparison.</p>
+      </div>
+    </div>
+
+    <!-- Interactive Epoch Comparison Tool -->
+    <div class="columns is-centered">
+      <div class="column is-full" style="max-width: 1200px; padding: 0 2rem;">
+        <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 1.5rem; border-radius: 12px; border: 2px solid #dee2e6;">
+          <h4 class="title is-5" style="margin-bottom: 1rem; color: #495057;">
+            <span class="icon" style="color: #3b82f6;"><i class="fas fa-sliders-h"></i></span>
+            Best FAD Comparison Tool
+          </h4>
+          <p style="font-size: 0.9rem; color: #6c757d; margin-bottom: 1rem;">Compare Baseline vs. MiDiff (voutputs. Select an audio file to compare side-by-side.</p>
+          
+          <div style="margin-bottom: 1rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+            <label style="font-weight: 600; font-size: 0.85rem; color: #495057; margin-bottom: 0.5rem; display: block; text-align: left; margin-left: -110px;">Audio file:</label>
+            <select id="epoch-compare-select" onchange="updateEpochComparison()" style="width: 100%; max-width: 500px; padding: 8px 12px; border-radius: 6px; border: 1px solid #ced4da; font-size: 0.9rem; margin-left: -110px; display: block;">
+              <option value="drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav" selected>drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav</option>
+              <option value="drummer1_2_funk-groove2_105_beat_4-4_brooklyn.wav">drummer1_2_funk-groove2_105_beat_4-4_brooklyn.wav</option>
+              <option value="drummer1_3_soul-groove3_86_beat_4-4_detroit_garage.wav">drummer1_3_soul-groove3_86_beat_4-4_detroit_garage.wav</option>
+              <option value="drummer1_4_soul-groove4_80_beat_4-4_east_bay.wav">drummer1_4_soul-groove4_80_beat_4-4_east_bay.wav</option>
+              <option value="drummer1_5_funk-groove5_84_beat_4-4_heavy.wav">drummer1_5_funk-groove5_84_beat_4-4_heavy.wav</option>
+              <option value="drummer1_6_hiphop-groove6_87_beat_4-4_motown_revisited.wav">drummer1_6_hiphop-groove6_87_beat_4-4_motown_revisited.wav</option>
+              <option value="drummer1_7_pop-groove7_138_beat_4-4_portland.wav">drummer1_7_pop-groove7_138_beat_4-4_portland.wav</option>
+              <option value="drummer1_8_rock-groove8_65_beat_4-4_retro_rock.wav">drummer1_8_rock-groove8_65_beat_4-4_retro_rock.wav</option>
+              <option value="drummer1_9_soul-groove9_105_beat_4-4_roots.wav">drummer1_9_soul-groove9_105_beat_4-4_roots.wav</option>
+              <option value="drummer1_10_soul-groove10_102_beat_4-4_socal.wav">drummer1_10_soul-groove10_102_beat_4-4_socal.wav</option>
+            </select>
+          </div>
+          
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+            <!-- Left comparison panel = Baseline -->
+            <div style="width: 350px; max-width: 100%; background: white; border-radius: 8px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+              <div style="font-size: 0.95rem; font-weight: 600; color: #c92a2a; margin-bottom: 8px;">Baseline</div>
+              <div id="epoch-compare-left-container" class="epoch-compare-sync-group" style="border: 2px solid #ff6b6b; border-radius: 8px; overflow-x: auto; overflow-y: hidden; white-space: nowrap; height: 160px; width: 100%; max-width: 340px; cursor: grab;">
+                <img id="epoch-compare-left-img" src="static/images/baseline_v180_drummer1_1_funk-groove1_138_beat_4-4_bluebird.png" alt="Left Comparison" class="epoch-compare-img" style="height: 156px; width: auto; max-width: 340px; display: inline-block;">
+              </div>
+              <audio id="epoch-compare-left-audio" controls style="width: 100%; max-width: 360px; height: 36px; margin-top: 8px; display: block;">
+                <source id="epoch-compare-left-audio-src" src="static/audio/baseline/version_180_last5/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav" type="audio/wav">
+              </audio>
+            </div>
+            
+            <!-- Right comparison panel = MiDiff -->
+            <div style="width: 350px; max-width: 100%; background: white; border-radius: 8px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+              <div style="font-size: 0.95rem; font-weight: 600; color: #1e40af; margin-bottom: 8px;">MiDiff</div>
+              <div id="epoch-compare-right-container" class="epoch-compare-sync-group" style="border: 2px solid #3b82f6; border-radius: 8px; overflow-x: auto; overflow-y: hidden; white-space: nowrap; height: 160px; width: 100%; max-width: 340px; cursor: grab;">
+                <img id="epoch-compare-right-img" src="static/images/midiff_v181_drummer1_1_funk-groove1_138_beat_4-4_bluebird.png" alt="Right Comparison" class="epoch-compare-img" style="height: 156px; width: auto; max-width: 340px; display: inline-block;">
+              </div>
+              <audio id="epoch-compare-right-audio" controls style="width: 100%; max-width: 360px; height: 36px; margin-top: 8px; display: block;">
+                <source id="epoch-compare-right-audio-src" src="static/audio/midi_conditioned/version_181_last5/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav" type="audio/wav">
+              </audio>
+            </div>
+          </div>
+          
+          <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; align-items: center;">
+            <button id="epoch-compare-sync-btn" onclick="toggleEpochCompareSync()" style="padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s;">
+              <i class="fas fa-link"></i> Sync Scrolling: ON
+            </button>
+            
+            <div style="display: flex; align-items: center; gap: 8px; background: white; padding: 6px 12px; border-radius: 6px; border: 1px solid #ced4da;">
+              <span style="font-weight: 600; font-size: 0.85rem; color: #495057;"><i class="fas fa-search"></i> Zoom:</span>
+              <button onclick="zoomEpochCompare(-0.25)" style="width: 32px; height: 32px; background: #e9ecef; border: 1px solid #ced4da; border-radius: 4px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">−</button>
+              <span id="epoch-compare-zoom-level" style="min-width: 50px; text-align: center; font-weight: 600; color: #495057;">200%</span>
+              <button onclick="zoomEpochCompare(0.25)" style="width: 32px; height: 32px; background: #e9ecef; border: 1px solid #ced4da; border-radius: 4px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">+</button>
+              <button onclick="resetEpochCompareZoom()" style="padding: 4px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">Reset</button>
+            </div>
+          </div>
+          
+          <p style="font-size: 0.8rem; color: #6c757d; text-align: center; margin-top: 0.75rem;"><i class="fas fa-info-circle"></i> Tip: Use mouse wheel while holding <kbd style="background: #e9ecef; padding: 2px 6px; border-radius: 3px; border: 1px solid #ced4da;">Ctrl</kbd> to zoom, or scroll horizontally to pan.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <script>
+    // Best FAD Comparison Tool Data - keyed by audio filename
+    // Audio: 5-second clips (last 5s) in version_180_last5/ and version_181_last5/
+    // Spectrogram images: static/images/baseline_v180_{base}.png, static/images/midiff_v181_{base}.png
+    const bestFadFilenames = [
+      'drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav',
+      'drummer1_2_funk-groove2_105_beat_4-4_brooklyn.wav',
+      'drummer1_3_soul-groove3_86_beat_4-4_detroit_garage.wav',
+      'drummer1_4_soul-groove4_80_beat_4-4_east_bay.wav',
+      'drummer1_5_funk-groove5_84_beat_4-4_heavy.wav',
+      'drummer1_6_hiphop-groove6_87_beat_4-4_motown_revisited.wav',
+      'drummer1_7_pop-groove7_138_beat_4-4_portland.wav',
+      'drummer1_8_rock-groove8_65_beat_4-4_retro_rock.wav',
+      'drummer1_9_soul-groove9_105_beat_4-4_roots.wav',
+      'drummer1_10_soul-groove10_102_beat_4-4_socal.wav'
+    ];
+    const bestFadCompareData = {};
+    bestFadFilenames.forEach(f => {
+      const base = f.replace(/\.wav$/, '');
+      bestFadCompareData[f] = {
+        baseline: {
+          img: 'static/images/baseline_v180_' + base + '.png',
+          audio: 'static/audio/baseline/version_180_last5/' + f,
+          color: '#c92a2a',
+          borderColor: '#ff6b6b'
+        },
+        midiff: {
+          img: 'static/images/midiff_v181_' + base + '.png',
+          audio: 'static/audio/midi_conditioned/version_181_last5/' + f,
+          color: '#1e40af',
+          borderColor: '#3b82f6'
+        }
+      };
+    });
+
+    let epochCompareSyncEnabled = true;
+    let epochCompareZoomLevel = 2.0;
+    const EPOCH_COMPARE_MIN_ZOOM = 1.0;
+    const EPOCH_COMPARE_MAX_ZOOM = 4.0;
+
+    function updateEpochComparison() {
+      const select = document.getElementById('epoch-compare-select');
+      const fileName = select.value;
+      const data = bestFadCompareData[fileName];
+      
+      if (data) {
+        // Left panel = Baseline
+        const bl = data.baseline;
+        document.getElementById('epoch-compare-left-img').src = bl.img;
+        document.getElementById('epoch-compare-left-container').style.borderColor = bl.borderColor;
+        document.getElementById('epoch-compare-left-audio-src').src = bl.audio;
+        document.getElementById('epoch-compare-left-audio').load();
+        
+        // Right panel = MiDiff
+        const md = data.midiff;
+        document.getElementById('epoch-compare-right-img').src = md.img;
+        document.getElementById('epoch-compare-right-container').style.borderColor = md.borderColor;
+        document.getElementById('epoch-compare-right-audio-src').src = md.audio;
+        document.getElementById('epoch-compare-right-audio').load();
+      }
+    }
+
+    function toggleEpochCompareSync() {
+      epochCompareSyncEnabled = !epochCompareSyncEnabled;
+      const btn = document.getElementById('epoch-compare-sync-btn');
+      if (epochCompareSyncEnabled) {
+        btn.innerHTML = '<i class="fas fa-link"></i> Sync Scrolling: ON';
+        btn.style.background = '#3b82f6';
+      } else {
+        btn.innerHTML = '<i class="fas fa-unlink"></i> Sync Scrolling: OFF';
+        btn.style.background = '#6c757d';
+      }
+    }
+
+    function zoomEpochCompare(delta) {
+      epochCompareZoomLevel = Math.max(EPOCH_COMPARE_MIN_ZOOM, Math.min(EPOCH_COMPARE_MAX_ZOOM, epochCompareZoomLevel + delta));
+      applyEpochCompareZoom();
+    }
+
+    function resetEpochCompareZoom() {
+      epochCompareZoomLevel = 2.0;
+      applyEpochCompareZoom();
+    }
+
+    const EPOCH_COMPARE_BASE_WIDTH = 350;
+    function applyEpochCompareZoom() {
+      document.getElementById('epoch-compare-zoom-level').textContent = Math.round(epochCompareZoomLevel * 100) + '%';
+      
+      document.querySelectorAll('.epoch-compare-img').forEach(img => {
+        img.style.height = (156 * epochCompareZoomLevel) + 'px';
+        img.style.maxWidth = (EPOCH_COMPARE_BASE_WIDTH * epochCompareZoomLevel) + 'px';
+      });
+      
+      document.querySelectorAll('.epoch-compare-sync-group').forEach(container => {
+        container.style.height = (160 * epochCompareZoomLevel) + 'px';
+      });
+    }
+
+    // Setup synchronized scrolling for epoch comparison tool
+    document.addEventListener('DOMContentLoaded', function() {
+      applyEpochCompareZoom();
+      const epochCompareContainers = document.querySelectorAll('.epoch-compare-sync-group');
+      let isEpochCompareScrolling = false;
+
+      epochCompareContainers.forEach(container => {
+        container.addEventListener('scroll', function() {
+          if (!epochCompareSyncEnabled || isEpochCompareScrolling) return;
+          isEpochCompareScrolling = true;
+          
+          const scrollRatio = this.scrollLeft / Math.max(1, this.scrollWidth - this.clientWidth);
+          
+          epochCompareContainers.forEach(other => {
+            if (other !== this) {
+              const maxScroll = other.scrollWidth - other.clientWidth;
+              other.scrollLeft = scrollRatio * maxScroll;
+            }
+          });
+          
+          setTimeout(() => { isEpochCompareScrolling = false; }, 10);
+        });
+
+        // Drag to scroll
+        let isDragging = false;
+        let startX, scrollLeft;
+
+        container.addEventListener('mousedown', (e) => {
+          isDragging = true;
+          container.style.cursor = 'grabbing';
+          startX = e.pageX - container.offsetLeft;
+          scrollLeft = container.scrollLeft;
+        });
+
+        container.addEventListener('mouseleave', () => {
+          isDragging = false;
+          container.style.cursor = 'grab';
+        });
+
+        container.addEventListener('mouseup', () => {
+          isDragging = false;
+          container.style.cursor = 'grab';
+        });
+
+        container.addEventListener('mousemove', (e) => {
+          if (!isDragging) return;
+          e.preventDefault();
+          const x = e.pageX - container.offsetLeft;
+          const walk = (x - startX) * 1.5;
+          container.scrollLeft = scrollLeft - walk;
+        });
+
+        // Ctrl + wheel to zoom
+        container.addEventListener('wheel', function(e) {
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            zoomEpochCompare(delta);
+          }
+        }, { passive: false });
+      });
+    });
+    </script>
+          
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <div class="content has-text-justified" style="margin: 1rem 0 1.5rem 0;">
+          
+          <div style="display: none;"><!-- Classifier-Free Guidance Section (commented out for now)
+          <h2 class="title is-3">Classifier-Free Guidance</h2>
+          <p>
+            Classifier-Free Guidance (CFG) is a technique that controls the strength of conditioning during inference by interpolating between conditional and unconditional predictions. The guidance scale \(w\) determines how strongly the model follows the MIDI Conditioning.
+          </p>
+          
+          <!-- Interactive CFG Player -->
+          <div style="background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; border: 2px solid #c084fc;">
+            <h5 class="title is-6" style="margin-bottom: 1rem; color: #7c3aed;">
+              <span class="icon" style="color: #9333ea;"><i class="fas fa-sliders-h"></i></span>
+              Interactive CFG Player
+            </h5>
+            
+            <div style="background: white; border-radius: 10px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+              <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <label style="font-weight: 600; color: #495057; min-width: 120px;">Guidance Scale:</label>
+                <div style="flex: 1; min-width: 250px; position: relative;">
+                  <input type="range" id="cfg-slider" min="0" max="3" step="0.1" value="1.0" 
+                         style="width: 100%; height: 8px; cursor: pointer; accent-color: #9333ea;">
+                  <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: 0.75rem; color: #6c757d; position: relative;">
+                    <span style="position: absolute; left: 0;">\(w=0\)</span>
+                    <span style="position: absolute; left: 33%; transform: translateX(-50%);">\(w=1\)</span>
+                    <span style="position: absolute; left: 66%; transform: translateX(-50%);">\(w=2\)</span>
+                    <span style="position: absolute; left: 99%; transform: translateX(-50%);">\(w=3\)</span>
+
+
+                  </div>
+                  <!-- Tick marks for available files -->
+                  <div style="position: absolute; top: 0; left: 0; right: 0; height: 8px; pointer-events: none;">
+                    <div style="position: absolute; left: 0%; width: 2px; height: 12px; background: #e74c3c; top: -2px;" title="Baseline (w=0)"></div>
+                    <div style="position: absolute; left: 33.33%; width: 2px; height: 12px; background: #27ae60; transform: translateX(-50%); top: -2px;" title="w=1"></div>
+                    <div style="position: absolute; left: 66.66%; width: 2px; height: 12px; background: #3498db; transform: translateX(-50%); top: -2px;" title="w=2"></div>
+                    <div style="position: absolute; left: 100%; width: 2px; height: 12px; background: #9333ea; transform: translateX(-100%); top: -2px;" title="w=3"></div>
+                  </div>
+                </div>
+                <div id="cfg-value-display" style="min-width: 80px; text-align: center; padding: 8px 16px; background: #27ae60; color: white; border-radius: 20px; font-weight: 700; font-size: 1.1rem;">
+                  \(w = 1\)
+                </div>
+              </div>
+              <p style="font-size: 0.75rem; color: #9333ea; margin-top: 0.75rem; text-align: center;">
+                <i class="fas fa-music"></i> Available samples at: <strong>(w=0) (Midiff) </strong>, <strong>\(w=1\)</strong>, <strong>\(w=2\)</strong>, <strong>\(w=3\)</strong>
+              </p>
+            </div>
+            
+            <!-- Spectrogram Display -->
+            <div style="background: white; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+              <div id="cfg-spectrogram-container" style="border: 2px solid #c084fc; border-radius: 8px; overflow: hidden; background: #1a1a2e;">
+                <img id="cfg-spectrogram-img" src="static/images/cfg_w_1.0.png" alt="CFG Spectrogram" style="width: 100%; height: auto; display: block;">
+              </div>
+              <div id="cfg-spectrogram-label" style="text-align: center; margin-top: 0.5rem; font-weight: 600; color: #27ae60;">
+                Spectrogram: \(w = 1\)
+              </div>
+            </div>
+            
+            <!-- Audio Player Container with preloaded audio elements -->
+            <div style="background: white; border-radius: 10px; padding: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+              <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <div id="cfg-audio-container" style="flex: 1; min-width: 250px;">
+                  <!-- Preloaded audio elements - only one visible at a time -->
+                  <audio id="cfg-audio-0" preload="auto" style="width: 100%; height: 50px; display: none;">
+                    <source src="static/audio/baseline/version_83/enhancement/use_midi=False_epoch_50/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav" type="audio/wav">
+                  </audio>
+                  <audio id="cfg-audio-1" controls preload="auto" style="width: 100%; height: 50px;">
+                    <source src="static/audio/midi_conditioned/cfg/w_1.0/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav" type="audio/wav">
+                  </audio>
+                  <audio id="cfg-audio-2" preload="auto" style="width: 100%; height: 50px; display: none;">
+                    <source src="static/audio/midi_conditioned/cfg/w_2.0/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav" type="audio/wav">
+                  </audio>
+                  <audio id="cfg-audio-3" preload="auto" style="width: 100%; height: 50px; display: none;">
+                    <source src="static/audio/midi_conditioned/cfg/w_3.0/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav" type="audio/wav">
+                  </audio>
+                </div>
+                <div id="cfg-description" style="min-width: 200px; padding: 10px 15px; background: #f0fdf4; border-left: 4px solid #27ae60; border-radius: 4px; font-size: 0.9rem;">
+                  <strong style="color: #27ae60;">Standard Conditioning</strong><br>
+                  <span style="color: #6c757d;">Normal MIDI conditioning strength</span>
+                </div>
+              </div>
+            </div>
+            
+            <p style="font-size: 0.85rem; color: #6c757d; margin-top: 1rem; text-align: center;">
+              <i class="fas fa-bolt"></i> Instant switching! All audio files are preloaded for seamless comparison.
+            </p>
+          </div>
+          
+          <script>
+          (function() {
+            // CFG configurations
+            const cfgConfigs = {
+              0: { label: 'Baseline', spec: 'static/images/cfg_baseline.png', audioId: 'cfg-audio-0' },
+              1: { label: '\\(w = 1\\)', spec: 'static/images/cfg_w_1.0.png', audioId: 'cfg-audio-1' },
+              2: { label: '\\(w = 2\\)', spec: 'static/images/cfg_w_2.0.png', audioId: 'cfg-audio-2' },
+              3: { label: '\\(w = 3\\)', spec: 'static/images/cfg_w_3.0.png', audioId: 'cfg-audio-3' }
+            };
+            
+            const availableW = [0, 1, 2, 3];
+            
+            function getColorForW(w) {
+              if (w === 0) return '#e74c3c';
+              if (w <= 1.5) return '#27ae60';
+              if (w <= 2.5) return '#3498db';
+              return '#9333ea';
+            }
+            
+            function getBgColorForW(w) {
+              if (w === 0) return '#fef2f2';
+              if (w <= 1.5) return '#f0fdf4';
+              if (w <= 2.5) return '#eff6ff';
+              return '#faf5ff';
+            }
+            
+            function getDescriptionForW(w) {
+              if (w === 0) return { title: 'No MIDI Conditioning', desc: 'Baseline model without MIDI input' };
+              if (w <= 1.5) return { title: 'Standard Conditioning', desc: 'Normal MIDI conditioning strength' };
+              if (w <= 2.5) return { title: 'Strong Conditioning', desc: 'Amplified MIDI conditioning' };
+              return { title: 'Maximum Conditioning', desc: 'Highly amplified MIDI conditioning' };
+            }
+            
+            function findClosestW(targetW) {
+              let closest = availableW[0];
+              let minDiff = Math.abs(targetW - closest);
+              for (const w of availableW) {
+                const diff = Math.abs(targetW - w);
+                if (diff < minDiff) {
+                  minDiff = diff;
+                  closest = w;
+                }
+              }
+              return closest;
+            }
+            
+            const slider = document.getElementById('cfg-slider');
+            const valueDisplay = document.getElementById('cfg-value-display');
+            const description = document.getElementById('cfg-description');
+            const spectrogramImg = document.getElementById('cfg-spectrogram-img');
+            const spectrogramLabel = document.getElementById('cfg-spectrogram-label');
+            
+            // Get all audio elements
+            const audioElements = {};
+            for (const w of availableW) {
+              audioElements[w] = document.getElementById(cfgConfigs[w].audioId);
+            }
+            
+            let currentW = 1; // Start at w=1.0
+            let activeAudio = audioElements[1];
+            
+            // Force all audio elements to load immediately
+            for (const w of availableW) {
+              audioElements[w].load();
+            }
+            
+            slider.addEventListener('input', function() {
+              const sliderW = parseFloat(this.value);
+              const closestW = findClosestW(sliderW);
+              const config = cfgConfigs[closestW];
+              const color = getColorForW(sliderW);
+              const bgColor = getBgColorForW(sliderW);
+              const descInfo = getDescriptionForW(sliderW);
+              
+              // Update display with actual slider value (LaTeX)
+              valueDisplay.innerHTML = sliderW === 0 ? 'Baseline' : `\\(w = ${sliderW.toFixed(1)}\\)`;
+              valueDisplay.style.background = color;
+              if (window.MathJax) MathJax.typeset([valueDisplay]);
+              
+              // Update description
+              description.style.background = bgColor;
+              description.style.borderLeftColor = color;
+              description.innerHTML = `<strong style="color: ${color};">${descInfo.title}</strong><br><span style="color: #6c757d;">${descInfo.desc}</span>`;
+              
+              // Update spectrogram label (LaTeX)
+              spectrogramLabel.innerHTML = `Spectrogram: ${config.label}`;
+              spectrogramLabel.style.color = color;
+              if (window.MathJax) MathJax.typeset([spectrogramLabel]);
+              
+              // Only switch audio if we're at a different w value
+              if (closestW !== currentW) {
+                const wasPlaying = !activeAudio.paused;
+                const savedTime = activeAudio.currentTime;
+                
+                // Pause old audio but remember its time
+                activeAudio.pause();
+                activeAudio.style.display = 'none';
+                activeAudio.removeAttribute('controls');
+                
+                // Switch to new audio
+                const newAudio = audioElements[closestW];
+                newAudio.style.display = 'block';
+                newAudio.setAttribute('controls', 'controls');
+                
+                // Update spectrogram
+                spectrogramImg.src = config.spec;
+                
+                // Set time on new audio - wrapped in try/catch and using a small delay
+                setTimeout(() => {
+                  newAudio.currentTime = savedTime;
+                  if (wasPlaying) {
+                    newAudio.play().catch(() => {});
+                  }
+                }, 50);
+                
+                activeAudio = newAudio;
+                currentW = closestW;
+              }
+            });
+            
+            // Snap to nearest available config on mouse up
+            slider.addEventListener('change', function() {
+              const sliderW = parseFloat(this.value);
+              const closestW = findClosestW(sliderW);
+              this.value = closestW;
+              
+              // Trigger input event to update display
+              this.dispatchEvent(new Event('input'));
+            });
+          })();
+          </script>
+          
+          <!-- CFG Video Comparison -->
+          <div style="background: white; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <h5 class="title is-6" style="margin-bottom: 1rem; color: #7c3aed;">
+              <span class="icon" style="color: #9333ea;"><i class="fas fa-video"></i></span>
+              CFG Comparison Video
+            </h5>
+            <p style="font-size: 0.9rem; color: #6c757d; margin-bottom: 1rem;">
+              Watch how different guidance scales affect the audio enhancement. The active section is highlighted while others are dimmed.
+            </p>
+            <div style="border: 2px solid #c084fc; border-radius: 8px; overflow: hidden; background: #1a1a2e;">
+              <video controls style="width: 100%; display: block;" preload="metadata">
+                <source src="cfg_composite_analysis_16k.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <div style="display: flex; justify-content: space-around; margin-top: 0.75rem; font-size: 0.8rem; color: #6c757d;">
+              <span><strong style="color: #e74c3c;">●</strong> Baseline (0-2.5s)</span>
+              <span><strong style="color: #27ae60;">●</strong> w=1 (2.5-5s)</span>
+              <span><strong style="color: #3498db;">●</strong> w=2 (5-7.5s)</span>
+              <span><strong style="color: #9333ea;">●</strong> w=3 (7.5-10s)</span>
+            </div>
+          </div>
+          </div><!-- end commented: Classifier-Free Guidance section -->
+        </div>
+      </div>
+    </div>
+          
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <div class="content has-text-justified" style="margin: 1rem 0 1.5rem 0;">
+          <h2 class="title is-3">Ablation Studies</h2>
+          
+          <!-- Impact of MIDI Velocity Information -->
+          <h3 class="title is-4">Impact of MIDI Velocity Information</h3>
+          <p>
+            To assess the impact of MIDI velocity information on model performance, we conducted an ablation study comparing two variants of our MIDI-conditioned diffusion model: one utilizing full MIDI data including velocity, and another using MIDI data with velocity information removed (i.e., all note velocities set to a constant value).
+          </p>
+          <figure style="margin-top: 1.25rem;">
+            <div style="position: relative; width: 100%; height: 380px; margin: 12px 0;">
+              <canvas id="velocityAblationChart"></canvas>
+            </div>
+            <figcaption style="text-align: center;">
+              <strong>Figure 4:</strong> Ablation study on velocity representation showing FAD scores for different configurations in log scale.
+            </figcaption>
+          </figure>
+        </div>
+
+        <!-- Velocity Sweep: Selection + single spectrogram and player (last 5 seconds) -->
+        <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 1.5rem; border-radius: 12px; border: 2px solid #dee2e6; margin-top: 1.5rem;">
+          <h4 class="title is-5" style="margin-bottom: 1rem; color: #495057;">
+            <span class="icon" style="color: #3b82f6;"><i class="fas fa-sliders-h"></i></span>
+            Velocity Sweep
+          </h4>
+          <p style="font-size: 0.9rem; color: #6c757d; margin-bottom: 1rem;">Select a velocity condition to view its spectrogram and listen. Source: drummer1_1_funk-groove1_138_beat_4-4_bluebird (last 5 seconds).</p>
+          
+          <div style="width: 350px; max-width: 100%; margin-left: auto; margin-right: auto;">
+            <label style="font-weight: 600; font-size: 0.85rem; color: #495057; margin-bottom: 0.5rem; display: block;">Velocity condition:</label>
+            <select id="velocity-sweep-select" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid #ced4da; font-size: 0.9rem; margin-bottom: 1rem;">
+              <option value="velocity_0">Velocity 0</option>
+              <option value="velocity_1">Velocity 1</option>
+              <option value="velocity_20">Velocity 20</option>
+              <option value="velocity_40">Velocity 40</option>
+              <option value="velocity_60">Velocity 60</option>
+              <option value="velocity_80">Velocity 80</option>
+              <option value="velocity_100">Velocity 100</option>
+              <option value="velocity_127" selected>Velocity 127</option>
+              <option value="random_velocity">Random Velocity</option>
+            </select>
+          
+            <div style="background: white; border-radius: 8px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+              <div id="velocity-sweep-spectrogram-container" class="velocity-sweep-spectrogram-group" style="border: 2px solid #3b82f6; border-radius: 8px; overflow-x: auto; overflow-y: hidden; white-space: nowrap; height: 160px; width: 100%; max-width: 340px; cursor: grab;">
+                <img id="velocity-sweep-img" class="velocity-sweep-spectrogram-img" src="static/images/velocity_sweep_v181_velocity_127.png" alt="Spectrogram" style="height: 156px; width: auto; max-width: 340px; display: inline-block;">
+              </div>
+              <audio id="velocity-sweep-audio" controls style="width: 100%; max-width: 360px; height: 36px; margin-top: 8px; display: block;">
+                <source id="velocity-sweep-audio-src" src="static/audio/midi_conditioned/velocity_sweep_v181_last5/velocity_127/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav" type="audio/wav">
+              </audio>
+            </div>
+          </div>
+          
+          <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px; background: white; padding: 6px 12px; border-radius: 6px; border: 1px solid #ced4da;">
+              <span style="font-weight: 600; font-size: 0.85rem; color: #495057;"><i class="fas fa-search"></i> Zoom:</span>
+              <button id="velocity-sweep-zoom-minus" style="width: 32px; height: 32px; background: #e9ecef; border: 1px solid #ced4da; border-radius: 4px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">−</button>
+              <span id="velocity-sweep-zoom-level" style="min-width: 50px; text-align: center; font-weight: 600; color: #495057;">200%</span>
+              <button id="velocity-sweep-zoom-plus" style="width: 32px; height: 32px; background: #e9ecef; border: 1px solid #ced4da; border-radius: 4px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">+</button>
+              <button id="velocity-sweep-zoom-reset" style="padding: 4px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">Reset</button>
+            </div>
+          </div>
+          
+          <p style="font-size: 0.8rem; color: #6c757d; text-align: center; margin-top: 0.75rem;"><i class="fas fa-info-circle"></i> Tip: Use mouse wheel while holding <kbd style="background: #e9ecef; padding: 2px 6px; border-radius: 3px; border: 1px solid #ced4da;">Ctrl</kbd> to zoom, or scroll horizontally to pan.</p>
+        </div>
+
+        <script>
+        (function() {
+          const velocitySweepData = {
+            velocity_0: { label: 'Velocity 0', img: 'static/images/velocity_sweep_v181_velocity_0.png', audio: 'static/audio/midi_conditioned/velocity_sweep_v181_last5/velocity_0/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav' },
+            velocity_1: { label: 'Velocity 1', img: 'static/images/velocity_sweep_v181_velocity_1.png', audio: 'static/audio/midi_conditioned/velocity_sweep_v181_last5/velocity_1/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav' },
+            velocity_20: { label: 'Velocity 20', img: 'static/images/velocity_sweep_v181_velocity_20.png', audio: 'static/audio/midi_conditioned/velocity_sweep_v181_last5/velocity_20/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav' },
+            velocity_40: { label: 'Velocity 40', img: 'static/images/velocity_sweep_v181_velocity_40.png', audio: 'static/audio/midi_conditioned/velocity_sweep_v181_last5/velocity_40/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav' },
+            velocity_60: { label: 'Velocity 60', img: 'static/images/velocity_sweep_v181_velocity_60.png', audio: 'static/audio/midi_conditioned/velocity_sweep_v181_last5/velocity_60/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav' },
+            velocity_80: { label: 'Velocity 80', img: 'static/images/velocity_sweep_v181_velocity_80.png', audio: 'static/audio/midi_conditioned/velocity_sweep_v181_last5/velocity_80/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav' },
+            velocity_100: { label: 'Velocity 100', img: 'static/images/velocity_sweep_v181_velocity_100.png', audio: 'static/audio/midi_conditioned/velocity_sweep_v181_last5/velocity_100/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav' },
+            velocity_127: { label: 'Velocity 127', img: 'static/images/velocity_sweep_v181_velocity_127.png', audio: 'static/audio/midi_conditioned/velocity_sweep_v181_last5/velocity_127/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav' },
+            random_velocity: { label: 'Random Velocity', img: 'static/images/velocity_sweep_v181_random_velocity.png', audio: 'static/audio/midi_conditioned/velocity_sweep_v181_last5/random_velocity/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav' }
+          };
+          let velocitySweepZoomLevel = 2.0;
+          const VELOCITY_SWEEP_MIN_ZOOM = 1.0;
+          const VELOCITY_SWEEP_MAX_ZOOM = 4.0;
+          const VELOCITY_SWEEP_BASE_HEIGHT = 156;
+          const VELOCITY_SWEEP_BASE_WIDTH = 340;
+
+          function updateVelocitySweep() {
+            const select = document.getElementById('velocity-sweep-select');
+            const value = select.value;
+            const data = velocitySweepData[value];
+            if (data) {
+              document.getElementById('velocity-sweep-img').src = data.img;
+              document.getElementById('velocity-sweep-img').alt = data.label;
+              const srcEl = document.getElementById('velocity-sweep-audio-src');
+              srcEl.src = data.audio;
+              document.getElementById('velocity-sweep-audio').load();
+            }
+          }
+
+          function zoomVelocitySweep(delta) {
+            velocitySweepZoomLevel = Math.max(VELOCITY_SWEEP_MIN_ZOOM, Math.min(VELOCITY_SWEEP_MAX_ZOOM, velocitySweepZoomLevel + delta));
+            applyVelocitySweepZoom();
+          }
+
+          function resetVelocitySweepZoom() {
+            velocitySweepZoomLevel = 2.0;
+            applyVelocitySweepZoom();
+          }
+
+          function applyVelocitySweepZoom() {
+            const zoomEl = document.getElementById('velocity-sweep-zoom-level');
+            const img = document.getElementById('velocity-sweep-img');
+            const container = document.getElementById('velocity-sweep-spectrogram-container');
+            if (zoomEl) zoomEl.textContent = Math.round(velocitySweepZoomLevel * 100) + '%';
+            if (img) {
+              img.style.height = (VELOCITY_SWEEP_BASE_HEIGHT * velocitySweepZoomLevel) + 'px';
+              img.style.maxWidth = (VELOCITY_SWEEP_BASE_WIDTH * velocitySweepZoomLevel) + 'px';
+            }
+            if (container) container.style.height = (160 * velocitySweepZoomLevel) + 'px';
+          }
+
+          document.addEventListener('DOMContentLoaded', function() {
+            applyVelocitySweepZoom();
+            const select = document.getElementById('velocity-sweep-select');
+            if (select) select.addEventListener('change', updateVelocitySweep);
+
+            document.getElementById('velocity-sweep-zoom-minus')?.addEventListener('click', () => zoomVelocitySweep(-0.25));
+            document.getElementById('velocity-sweep-zoom-plus')?.addEventListener('click', () => zoomVelocitySweep(0.25));
+            document.getElementById('velocity-sweep-zoom-reset')?.addEventListener('click', resetVelocitySweepZoom);
+
+            const container = document.getElementById('velocity-sweep-spectrogram-container');
+            if (container) {
+              container.addEventListener('wheel', function(e) {
+                if (e.ctrlKey || e.metaKey) {
+                  e.preventDefault();
+                  const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                  zoomVelocitySweep(delta);
+                }
+              }, { passive: false });
+            }
+          });
+        })();
+        </script>
+
+        <h2 class="title is-3" style="margin-top: 2rem;">Conclusion</h2>
+        <div class="content has-text-justified">
+          <p>
+            We presented MiDiff, a MIDI-conditioned diffusion model for drum audio enhancement that extends SGMSE by integrating three complementary conditioning strategies: early injection, FiLM, and cross-attention. By incorporating symbolic musical information through a MIDI encoder and combining these approaches within a single architecture, our model makes musically-informed enhancement decisions that preserve rhythmic structure and drum timbre. The results demonstrate improved Fréchet Audio Distance compared to baselines, with perceptual evaluation confirming superior denoising quality. This work validates the effectiveness of multi-strategy MIDI conditioning for audio enhancement and opens promising directions for extending this approach to other instruments, multi-track scenarios, and real-time applications.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title">BibTeX</h2>
+    <pre><code>@article{anonymous2026midiff,
+      author    = {Anonymous},
+      title     = {MiDiff: MIDI-Conditioned Diffusion Models for Drum Audio Enhancement},
+      journal   = {TBD},
+      year      = {2026},
+      note      = {Author list withheld pending review/de-anonymization},
+    }</code></pre>
+    </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link" href="#" style="margin: 0 10px;">
+        <i class="fas fa-file-pdf fa-lg"></i>
+      </a>
+      <a class="icon-link" href="#" style="margin: 0 10px;">
+        <i class="fab fa-github fa-lg"></i>
+      </a>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            <strong>Credits:</strong><br>
+            For the website we used the source code from the <a href="https://github.com/nerfies/nerfies.github.io" target="_blank">Nerfies</a> website.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Statcounter tracking code -->
+
+<!-- You can add a tracker to track page visits by creating an account at statcounter.com -->
+
+    <!-- End of Statcounter Code -->
+
+<script>
+// Initialize SeeWav instances for all audio files
+document.addEventListener('DOMContentLoaded', function() {
+  
+  // Configuration for SeeWav waveforms
+  const waveConfig = {
+    height: 60,
+    width: '100%',
+    color: '#3273dc',
+    progressColor: '#209cee',
+    backgroundColor: '#f5f5f5',
+    cursorColor: '#363636',
+    responsive: true,
+    normalize: true,
+    pixelRatio: window.devicePixelRatio || 1
+  };
+
+  // Function to create SeeWav instance
+  function createSeeWav(containerId, audioSrc) {
+    const container = document.getElementById(containerId);
+    if (!container) return null;
+    
+    return new SeeWav({
+      container: container,
+      url: audioSrc,
+      ...waveConfig
+    });
+  }
+
+  // Reference Audio Waveforms
+  const cleanWave = createSeeWav('waveform-clean', 'static/audio/dataset/clean/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav');
+  const noisyWave = createSeeWav('waveform-noisy', 'static/audio/dataset/noisy/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav');
+
+  // Model Outputs Waveforms - 0 Epochs (Initial)
+  const baseline0Wave = createSeeWav('waveform-baseline-0', 'static/baseline_model/epoch0_10_soul-groove10_102_4-4_bluebird_v1_noisy.wav');
+  const ctc0Wave = createSeeWav('waveform-ctc-0', 'static/ctc_loss/epoch0_10_soul-groove10_102_4-4_bluebird_v1_noisy.wav');
+
+  // Model Outputs Waveforms - 10 Epochs
+  const baseline10Wave = createSeeWav('waveform-baseline-10', 'static/baseline_model/epoch10_10_soul-groove10_102_4-4_bluebird_v1_noisy.wav');
+  const ctc10Wave = createSeeWav('waveform-ctc-10', 'static/ctc_loss/epoch10_10_soul-groove10_102_4-4_bluebird_v1_noisy.wav');
+
+  // Model Outputs Waveforms - 20 Epochs
+  const baseline20Wave = createSeeWav('waveform-baseline-20', 'static/baseline_model/epoch20_10_soul-groove10_102_4-4_bluebird_v1_noisy.wav');
+  const ctc20Wave = createSeeWav('waveform-ctc-20', 'static/ctc_loss/epoch20_10_soul-groove10_102_4-4_bluebird_v1_noisy.wav');
+
+  // Sync waveforms with audio controls
+  const audioMappings = [
+    { audioId: 'audio-clean', wave: cleanWave },
+    { audioId: 'audio-noisy', wave: noisyWave },
+    { audioId: 'audio-baseline-0', wave: baseline0Wave },
+    { audioId: 'audio-ctc-0', wave: ctc0Wave },
+    { audioId: 'audio-baseline-10', wave: baseline10Wave },
+    { audioId: 'audio-ctc-10', wave: ctc10Wave },
+    { audioId: 'audio-baseline-20', wave: baseline20Wave },
+    { audioId: 'audio-ctc-20', wave: ctc20Wave }
+  ];
+
+  audioMappings.forEach(({ audioId, wave }) => {
+    if (!wave) return;
+    
+    const audioEl = document.getElementById(audioId);
+    if (!audioEl) return;
+    
+    // Sync audio controls with waveform
+    audioEl.addEventListener('play', () => {
+      if (wave.play) wave.play();
+    });
+    
+    audioEl.addEventListener('pause', () => {
+      if (wave.pause) wave.pause();
+    });
+    
+    audioEl.addEventListener('timeupdate', () => {
+      if (wave.seekTo && audioEl.duration) {
+        const progress = audioEl.currentTime / audioEl.duration;
+        wave.seekTo(progress);
+      }
+    });
+
+    // Click on waveform to control audio
+    if (wave.on) {
+      wave.on('click', (progress) => {
+        if (audioEl.duration) {
+          audioEl.currentTime = progress * audioEl.duration;
+        }
+      });
+      
+      wave.on('play', () => {
+        audioEl.play();
+      });
+      
+      wave.on('pause', () => {
+        audioEl.pause();
+      });
+    }
+  });
+
+  // Alternative approach if SeeWav doesn't have event listeners
+  // Add click handlers to waveform containers
+  document.querySelectorAll('[id^="waveform-"]').forEach(container => {
+    container.addEventListener('click', (e) => {
+      const rect = container.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const progress = clickX / rect.width;
+      
+      // Find corresponding audio element
+      const waveformId = container.id;
+      const audioId = waveformId.replace('waveform-', 'audio-');
+      const audioEl = document.getElementById(audioId);
+      
+      if (audioEl && audioEl.duration) {
+        audioEl.currentTime = progress * audioEl.duration;
+      }
+    });
+  });
+});
+</script>
+
+<script>
+// Function to load CSV data
+async function loadCSV(url) {
+  const response = await fetch(url);
+  const text = await response.text();
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',');
+  const data = [];
+  
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split(',');
+    const row = {};
+    headers.forEach((header, index) => {
+      row[header.trim()] = parseFloat(values[index]) || values[index];
+    });
+    data.push(row);
+  }
+  return data;
+}
+
+
+// Initialize the chart
+async function initChart() {
+  console.log('Starting chart initialization...');
+  
+  try {
+    console.log('Loading CSV files...');
+    // Load both CSV files
+    const baselineData = await loadCSV('static/graphs/frechet_loss/tensorboard_logs_version_180.csv');
+    const ctcData = await loadCSV('static/graphs/frechet_loss/tensorboard_logs_version_181.csv');
+    
+    console.log('Baseline data:', baselineData.length, 'points');
+    console.log('CTC data:', ctcData.length, 'points');
+    console.log('Sample baseline data:', baselineData.slice(0, 3));
+    console.log('Sample CTC data:', ctcData.slice(0, 3));
+
+    const chartElement = document.getElementById('frechetChart');
+    console.log('Chart element found:', chartElement);
+    
+    if (!chartElement) {
+      console.error('Chart element not found!');
+      return;
+    }
+
+    const ctx = chartElement.getContext('2d');
+    console.log('Canvas context:', ctx);
+    
+    const STEPS_PER_EPOCH = 1102;
+    window.frechetChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        datasets: [{
+          label: 'Baseline Model',
+          data: baselineData.map(row => ({
+            x: (row.Step / STEPS_PER_EPOCH) - 1,
+            y: row.Value
+          })),
+          borderColor: 'rgb(255, 99, 132)',
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        }, {
+          label: 'Midi Conditioned Model',
+          data: ctcData.map(row => ({
+            x: (row.Step / STEPS_PER_EPOCH) - 1,
+            y: row.Value
+          })),
+          borderColor: 'rgb(54, 162, 235)',
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          borderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            type: 'linear',
+            min: 0,
+            max: 60,
+            title: {
+              display: true,
+              text: 'Epoch'
+            },
+            ticks: {
+              callback: (value) => {
+                // Prefer near-integers; otherwise show one decimal
+                const rounded = Math.round(value);
+                return Math.abs(value - rounded) < 0.05 ? String(rounded) : value.toFixed(1);
+              }
+            }
+          },
+          y: {
+            type: 'logarithmic',
+            title: {
+              display: true,
+              text: 'Frechet VGGish Score'
+            }
+          }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: 'Frechet VGGish Score Comparison During Training'
+          },
+          legend: {
+            display: true,
+            position: 'top'
+          },
+          tooltip: {
+            mode: 'point',
+            intersect: false,
+            callbacks: {
+              label: function(context) {
+                const epoch = context.parsed.x;
+                return `${context.dataset.label}: ${context.parsed.y.toFixed(4)} (Epoch: ${epoch.toFixed(0)})`;
+              }
+            }
+          }
+        },
+        interaction: {
+          mode: 'nearest',
+          axis: 'x',
+          intersect: false
+        }
+      }
+    });
+    
+    console.log('Chart created successfully:', window.frechetChart);
+  } catch (error) {
+    console.error('Error loading chart data:', error);
+    document.getElementById('frechetChart').parentElement.innerHTML = 
+      '<p style="text-align: center; color: red;">Error loading chart data: ' + error.message + '</p>';
+  }
+}
+
+// Toggle logarithmic scale
+function toggleLogScale() {
+  const checkbox = document.getElementById('logScaleToggle');
+  if (window.frechetChart) {
+    window.frechetChart.options.scales.y.type = checkbox.checked ? 'logarithmic' : 'linear';
+    window.frechetChart.update();
+  }
+}
+
+// Initialize chart when page loads
+document.addEventListener('DOMContentLoaded', initChart);
+</script>
+
+<script>
+// Initialize Velocity Ablation bar chart in Impact section
+document.addEventListener('DOMContentLoaded', function() {
+  const canvas = document.getElementById('velocityAblationChart');
+  if (!canvas || !window.Chart) return;
+
+  const labels = ['Baseline', 'MiDiff', 'MiDiff (Random Velocity)', '0', '1', '20', '40', '60', '80', '100', '127'];
+  const baseline =      [0.4797, null,   null,                     null, null,  null,  null,  null,  null,  null,   null];
+  const midiff =        [null,   0.3923, null,                     null, null,  null,  null,  null,  null,  null,   null];
+  const randomVel =     [null,   null,   14.824064,                null, null,  null,  null,  null,  null,  null,   null];
+  const constantVel =   [null,   null,   null,                     15.052656, 14.930122, 1.45304, 0.628265, 0.62716, 0.607096, 0.631502, 0.628135];
+
+  const ctx = canvas.getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Baseline (No MIDI)', data: baseline, backgroundColor: 'rgba(231, 76, 60, 0.85)' },
+        { label: 'MiDiff', data: midiff, backgroundColor: 'rgba(39, 174, 96, 0.85)' },
+        { label: 'MiDiff (Random Velocity)', data: randomVel, backgroundColor: 'rgba(230, 126, 34, 0.85)' },
+        { label: 'MiDiff (Constant Velocity)', data: constantVel, backgroundColor: 'rgba(52, 152, 219, 0.85)' }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          title: { display: true, text: 'Velocity Configuration' },
+          ticks: { 
+            minRotation: 45, 
+            maxRotation: 45,
+            autoSkip: false,
+            maxTicksLimit: 20,
+            padding: 5
+          },
+          grid: { display: false },
+          offset: true
+        },
+        y: {
+          type: 'logarithmic',
+          min: 0.1,
+          max: 20,
+          title: { display: true, text: 'FAD Score (↓ lower is better, log scale)' },
+          grid: { borderDash: [4, 4] }
+        }
+      },
+      plugins: {
+        legend: { position: 'right' },
+        title: { display: true, text: 'Velocity Ablation: FAD Score' },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              const v = ctx.parsed.y;
+              if (v == null) return null;
+              return `${ctx.dataset.label}: ${v.toFixed(4)}`;
+            }
+          }
+        }
+      }
+    }
+  });
+});
+</script>
+
+<style>
+  /* Arrow pulse animation */
+  @keyframes pulse-arrow {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.9;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 1;
+    }
+  }
+
+  /* MIDI Player Consistent Styling */
+  midi-player {
+    width: 100% !important;
+    height: 40px !important;
+    max-height: 40px !important;
+    min-height: 40px !important;
+    border-radius: 8px !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    font-size: 12px !important;
+  }
+  
+  /* Target internal elements of midi-player */
+  midi-player::part(control-panel) {
+    height: 40px !important;
+    max-height: 40px !important;
+  }
+
+  /* Force MIDI player field and control to have no extra spacing */
+  .box .field .control midi-player {
+    line-height: 40px !important;
+  }
+  
+  .box .field .control {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Remove extra spacing from Bulma's field class in audio reference boxes */
+  .box .field:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  /* Make all three reference cards equal height */
+  .columns.is-centered > .column.is-4 {
+    display: flex !important;
+  }
+  
+  .columns.is-centered > .column.is-4 > .box {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    min-height: 100% !important;
+  }
+
+  /* Responsive Design Adjustments */
+  @media (max-width: 768px) {
+    .container {
+      padding: 0 15px;
+    }
+    
+    .title.is-1 {
+      font-size: 2.5rem;
+    }
+    
+    .title.is-2 {
+      font-size: 2rem;
+    }
+    
+    .title.is-3 {
+      font-size: 1.75rem;
+    }
+    
+    .table-container {
+      overflow-x: auto;
+    }
+    
+    .columns {
+      flex-direction: column;
+    }
+    
+    .column {
+      width: 100%;
+    }
+    
+    #chart-container {
+      height: 300px;
+    }
+  }
+</style>
+
+<script>
+// Drag-to-scroll functionality for spectrogram containers
+document.addEventListener('DOMContentLoaded', function() {
+  const spectrogramContainers = document.querySelectorAll('.spectrogram-scroll-container');
+  
+  spectrogramContainers.forEach(container => {
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+    
+    container.addEventListener('mousedown', (e) => {
+      isDown = true;
+      container.style.cursor = 'grabbing';
+      startX = e.pageX - container.offsetLeft;
+      scrollLeft = container.scrollLeft;
+      e.preventDefault();
+    });
+    
+    container.addEventListener('mouseleave', () => {
+      isDown = false;
+      container.style.cursor = 'grab';
+    });
+    
+    container.addEventListener('mouseup', () => {
+      isDown = false;
+      container.style.cursor = 'grab';
+    });
+    
+    container.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - container.offsetLeft;
+      const walk = (x - startX) * 2; // Scroll speed multiplier
+      container.scrollLeft = scrollLeft - walk;
+    });
+  });
+});
+
+// Force MathJax to typeset when page loads and when MathJax becomes ready
+function mathJaxTypeset() {
+  if (window.MathJax && MathJax.typesetPromise) {
+    return MathJax.typesetPromise().catch((err) => console.warn('MathJax typeset:', err));
+  }
+  return Promise.resolve();
+}
+document.addEventListener('DOMContentLoaded', function() {
+  mathJaxTypeset();
+  // Retry when MathJax script loads (handles async load race)
+  const mjScript = document.getElementById('MathJax-script');
+  if (mjScript && !mjScript.hasAttribute('data-typeset-done')) {
+    mjScript.addEventListener('load', function() {
+      setTimeout(mathJaxTypeset, 100);
+      mjScript.setAttribute('data-typeset-done', '1');
+    });
+    if (mjScript.readyState === 'complete') setTimeout(mathJaxTypeset, 500);
+  }
+  // Fallback retry for slow connections
+  setTimeout(mathJaxTypeset, 1500);
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Synchronized scrolling for velocity cards
+  const velocityContainers = document.querySelectorAll('.velocity-scroll-group');
+  if (velocityContainers.length > 0) {
+    let isVelocityScrolling = false;
+    
+    velocityContainers.forEach(container => {
+      container.addEventListener('scroll', function() {
+        if (!isVelocityScrolling) {
+          isVelocityScrolling = true;
+          const scrollRatio = this.scrollLeft / (this.scrollWidth - this.clientWidth);
+          velocityContainers.forEach(other => {
+            if (other !== this) {
+              other.scrollLeft = scrollRatio * (other.scrollWidth - other.clientWidth);
+            }
+          });
+          setTimeout(() => { isVelocityScrolling = false; }, 10);
+        }
+      });
+    });
+  }
+});
+</script>
+
+  </body>
+  </html>
