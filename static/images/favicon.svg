@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="MiDiff">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2563eb"/>
+      <stop offset="1" stop-color="#6d28d9"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="7" fill="url(#bg)"/>
+  <!-- Letter M -->
+  <path fill="#ffffff" d="M7 24V8h3l4.5 10.5L19 8h3v16h-2.5V11.5L14.5 24h-2L9.5 11.5V24H7z"/>
+  <!-- MIDI hint: two note stems -->
+  <rect x="23.5" y="9" width="1.8" height="5" rx="0.4" fill="#dbeafe"/>
+  <rect x="23.5" y="16" width="1.8" height="7" rx="0.4" fill="#dbeafe"/>
+</svg>
