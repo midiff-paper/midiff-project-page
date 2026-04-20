@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- ISMIR / Music-IR supplementary page meta -->
-  <meta name="description" content="MiDiff — MIDI-conditioned diffusion for drum audio enhancement. Companion website with audio samples and figures (ISMIR / Music Information Retrieval supplementary material).">
+  <meta name="description" content="MiDiff — MIDI-conditioned diffusion for drum enhancement (StemGMD). Companion audio &amp; figures for ISMIR; FAD 0.29 vs. baseline 0.56 (validation, paper).">
   <meta name="theme-color" content="#0f172a"/>
   <meta property="og:title" content="MiDiff | ISMIR supplementary material"/>
   <meta property="og:description" content="MIDI-conditioned diffusion models for drum audio enhancement: demos, spectrograms, and ablations (ISMIR companion page)."/>
@@ -158,8 +158,6 @@
   <script src="static/js/bulma-carousel.min.js"></script>
   <script src="static/js/bulma-slider.min.js"></script>
   <script src="static/js/index.js"></script>
-  <!-- SeeWav for audio waveform visualization -->
-  <script src="https://unpkg.com/seewav@1.0.0/dist/seewav.min.js"></script>
   <!-- Chart.js for interactive graphs -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
   <!-- MIDI Player -->
@@ -257,6 +255,7 @@
             Bridging the semantic gap between perfect symbolic musical structure and severely degraded acoustic signals offers a powerful new paradigm for high-fidelity audio restoration.
             In this work, we introduce MiDiff, a diffusion-based generative model for drum audio enhancement that conditions the reverse process on temporally aligned MIDI piano rolls. We extend the Score-Based Generative Models for Speech Enhancement (SGMSE) framework in the complex STFT domain by integrating a pretrained MIDI encoder, multi-scale temporal alignment, and three complementary conditioning strategies: early injection, Feature-wise Linear Modulation (FiLM), and cross-attention. To enforce structural fidelity and control the conditioning strength, we investigate two separate guidance mechanisms: classifier guidance driven by an Automatic Drum Transcription (ADT) model, and classifier-free guidance. We train our model on the StemGMD dataset using a non-additive degradation pipeline that simulates room acoustics, electret capsule response, and codec compression. MiDiff achieves a Fréchet Audio Distance (FAD) of 0.29, substantially outperforming the audio-only baseline (0.56). Ablation studies demonstrate that combining all three conditioning strategies yields the best results and that authentic MIDI velocity dynamics are critical for effective symbolic conditioning. 
             Our method demonstrates the immense potential of leveraging symbolic priors to reconstruct high-fidelity percussive audio.
+            Qualitative results and audio demonstrations are available on this companion page: <a href="https://midiff-paper.github.io/midiff-project-page/">midiff-paper.github.io/midiff-project-page</a> (also cited in our ISMIR submission).
           </p>
         </div>
       </div>
@@ -279,14 +278,14 @@
             <strong>FiLM.</strong> We employ FiLM layers with scaling/shifting parameters:
           </p>
           <p style="text-align: center; background: #f8f9fa; border-left: 4px solid #007bff; padding: 1.5rem; margin: 2rem 0; font-size: 1.15rem;">
-            \[\gamma_{i,c} = f_c(\mathbf{m}_i), \quad \beta_{i,c} = h_c(\mathbf{m}_i), \quad \text{FiLM}(F_{i,c}|\gamma_{i,c}, \beta_{i,c}) = \gamma_{i,c}F_{i,c} + \beta_{i,c}\]
+            \[[\boldsymbol{\gamma}, \boldsymbol{\beta}] = \mathrm{Conv1D}_{1\times 1}(\mathbf{M}), \quad \mathrm{FiLM}(x) = (1 + \boldsymbol{\gamma}) \odot x + \boldsymbol{\beta}\]
           </p>
           <p>
-            A single <em>FiLM generator</em> outputs \((\boldsymbol{\gamma}_{i}, \boldsymbol{\beta}_{i})\) from \(\mathbf{m}_i\). FiLM blocks follow each ResNet block, enabling hierarchical modulation. We retained frame-wise FiLM over Temporal FiLM for lower FAD.
+            A \(1{\times}1\) convolution projects aligned MIDI embeddings \(\mathbf{M}\) into scale \(\boldsymbol{\gamma}\) and shift \(\boldsymbol{\beta}\), broadcast across frequency; the \((1 + \boldsymbol{\gamma})\) form initializes near identity. FiLM follows each NCSN++ residual block—we use frame-wise FiLM (which achieved lower FAD than temporal FiLM in our experiments).
           </p>
 
           <p>
-            <strong>Cross-Attention.</strong> Spectral features attend to MIDI embeddings as keys/values. A cross-attention block is inserted before every self-attention layer.
+            <strong>Cross-Attention.</strong> Spectral features serve as queries; aligned MIDI embeddings are keys and values. Cross-attention blocks are inserted after every self-attention layer in the encoder, bottleneck, and decoder (at resolutions \(\{4,8,16,32\}\) time steps).
           </p>
 
           <p>
@@ -848,7 +847,7 @@
       <div class="column is-four-fifths">
         <h2 class="title is-3">Results</h2>
         <div class="content">
-          <p>To quantitatively evaluate performance, we calculated standard audio quality metrics. The Frechet VGGish Score measures the similarity between distributions of embeddings from the generated audio and the ground truth clean audio. <strong>A lower score indicates higher similarity to the clean audio.</strong></p>
+          <p>We report <strong>Fréchet Audio Distance (FAD)</strong>, computed from VGGish embeddings following Kilgour et al.: a lower FAD indicates generated audio closer in distribution to clean references. Validation curves below compare our MIDI-conditioned MiDiff training run to the audio-only SGMSE baseline (StemGMD setup as in the paper).</p>
         </div>
         
         <figure style="margin-top: 2rem;">
@@ -861,7 +860,7 @@
             </div>
             <canvas id="frechetChart"></canvas>
           </div>
-          <figcaption style="text-align: center;"><strong>Figure 3:</strong> Interactive Frechet VGGish Score vs. Epochs for Baseline vs. Midi Conditioned models.</figcaption>
+          <figcaption style="text-align: center;"><strong>Figure 3:</strong> Interactive FAD vs. training epoch (log-scaled axis): baseline SGMSE vs. MiDiff (same preprocessing; see paper for hyperparameters).</figcaption>
         </figure>
         
       </div>
@@ -882,7 +881,7 @@
             <span class="icon" style="color: #3b82f6;"><i class="fas fa-sliders-h"></i></span>
             Best FAD Comparison Tool
           </h4>
-          <p style="font-size: 0.9rem; color: #6c757d; margin-bottom: 1rem;">Compare Baseline vs. MiDiff (voutputs. Select an audio file to compare side-by-side.</p>
+          <p style="font-size: 0.9rem; color: #6c757d; margin-bottom: 1rem;">Compare baseline vs. MiDiff outputs. Select an audio file to compare side-by-side.</p>
           
           <div style="margin-bottom: 1rem; max-width: 500px; margin-left: auto; margin-right: auto;">
             <label style="font-weight: 600; font-size: 0.85rem; color: #495057; margin-bottom: 0.5rem; display: block; text-align: left; margin-left: -110px;">Audio file:</label>
@@ -1498,7 +1497,7 @@
         <h2 class="title is-3" style="margin-top: 2rem;">Conclusion</h2>
         <div class="content has-text-justified">
           <p>
-            We presented MiDiff, a MIDI-conditioned diffusion model for drum audio enhancement that extends SGMSE by integrating three complementary conditioning strategies: early injection, FiLM, and cross-attention. By incorporating symbolic musical information through a MIDI encoder and combining these approaches within a single architecture, our model makes musically-informed enhancement decisions that preserve rhythmic structure and drum timbre. The results demonstrate improved Fréchet Audio Distance compared to baselines, with perceptual evaluation confirming superior denoising quality. This work validates the effectiveness of multi-strategy MIDI conditioning for audio enhancement and opens promising directions for extending this approach to other instruments, multi-track scenarios, and real-time applications.
+            We introduced MiDiff, a MIDI-conditioned diffusion framework for drum enhancement that bridges symbolic and acoustic representations via early injection, FiLM, and cross-attention, with classifier-free guidance at inference to control conditioning strength without an external classifier. On StemGMD, MiDiff reaches FAD <strong>0.29</strong> vs. <strong>0.56</strong> for the audio-only baseline; ablations show all three conditioning paths together work best and that authentic MIDI velocities matter. Future work includes extending the framework toward automatic transcription and other instruments. This companion site hosts qualitative audio and figures referenced in our ISMIR submission.
           </p>
         </div>
       </div>
@@ -1506,6 +1505,18 @@
   </div>
 </section>
 
+
+<section class="section" id="Ethics">
+    <div class="container is-max-desktop content">
+      <h2 class="title is-3">Ethics statement</h2>
+      <div class="content has-text-justified">
+        <p>
+          This companion site accompanies research using the StemGMD dataset under its license for Music IR and audio processing.
+          The method targets drum audio enhancement for musicians and producers; users should comply with dataset terms and applicable regulations.
+        </p>
+      </div>
+    </div>
+</section>
 
 <section class="section" id="BibTeX">
     <div class="container is-max-desktop content">
@@ -1551,124 +1562,6 @@
     <!-- End of Statcounter Code -->
 
 <script>
-// Initialize SeeWav instances for all audio files
-document.addEventListener('DOMContentLoaded', function() {
-  
-  // Configuration for SeeWav waveforms
-  const waveConfig = {
-    height: 60,
-    width: '100%',
-    color: '#3273dc',
-    progressColor: '#209cee',
-    backgroundColor: '#f5f5f5',
-    cursorColor: '#363636',
-    responsive: true,
-    normalize: true,
-    pixelRatio: window.devicePixelRatio || 1
-  };
-
-  // Function to create SeeWav instance
-  function createSeeWav(containerId, audioSrc) {
-    const container = document.getElementById(containerId);
-    if (!container) return null;
-    
-    return new SeeWav({
-      container: container,
-      url: audioSrc,
-      ...waveConfig
-    });
-  }
-
-  // Reference Audio Waveforms
-  const cleanWave = createSeeWav('waveform-clean', 'static/audio/dataset/clean/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav');
-  const noisyWave = createSeeWav('waveform-noisy', 'static/audio/dataset/noisy/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav');
-
-  // Model Outputs Waveforms - 0 Epochs (Initial)
-  const baseline0Wave = createSeeWav('waveform-baseline-0', 'static/baseline_model/epoch0_10_soul-groove10_102_4-4_bluebird_v1_noisy.wav');
-  const ctc0Wave = createSeeWav('waveform-ctc-0', 'static/ctc_loss/epoch0_10_soul-groove10_102_4-4_bluebird_v1_noisy.wav');
-
-  // Model Outputs Waveforms - 10 Epochs
-  const baseline10Wave = createSeeWav('waveform-baseline-10', 'static/baseline_model/epoch10_10_soul-groove10_102_4-4_bluebird_v1_noisy.wav');
-  const ctc10Wave = createSeeWav('waveform-ctc-10', 'static/ctc_loss/epoch10_10_soul-groove10_102_4-4_bluebird_v1_noisy.wav');
-
-  // Model Outputs Waveforms - 20 Epochs
-  const baseline20Wave = createSeeWav('waveform-baseline-20', 'static/baseline_model/epoch20_10_soul-groove10_102_4-4_bluebird_v1_noisy.wav');
-  const ctc20Wave = createSeeWav('waveform-ctc-20', 'static/ctc_loss/epoch20_10_soul-groove10_102_4-4_bluebird_v1_noisy.wav');
-
-  // Sync waveforms with audio controls
-  const audioMappings = [
-    { audioId: 'audio-clean', wave: cleanWave },
-    { audioId: 'audio-noisy', wave: noisyWave },
-    { audioId: 'audio-baseline-0', wave: baseline0Wave },
-    { audioId: 'audio-ctc-0', wave: ctc0Wave },
-    { audioId: 'audio-baseline-10', wave: baseline10Wave },
-    { audioId: 'audio-ctc-10', wave: ctc10Wave },
-    { audioId: 'audio-baseline-20', wave: baseline20Wave },
-    { audioId: 'audio-ctc-20', wave: ctc20Wave }
-  ];
-
-  audioMappings.forEach(({ audioId, wave }) => {
-    if (!wave) return;
-    
-    const audioEl = document.getElementById(audioId);
-    if (!audioEl) return;
-    
-    // Sync audio controls with waveform
-    audioEl.addEventListener('play', () => {
-      if (wave.play) wave.play();
-    });
-    
-    audioEl.addEventListener('pause', () => {
-      if (wave.pause) wave.pause();
-    });
-    
-    audioEl.addEventListener('timeupdate', () => {
-      if (wave.seekTo && audioEl.duration) {
-        const progress = audioEl.currentTime / audioEl.duration;
-        wave.seekTo(progress);
-      }
-    });
-
-    // Click on waveform to control audio
-    if (wave.on) {
-      wave.on('click', (progress) => {
-        if (audioEl.duration) {
-          audioEl.currentTime = progress * audioEl.duration;
-        }
-      });
-      
-      wave.on('play', () => {
-        audioEl.play();
-      });
-      
-      wave.on('pause', () => {
-        audioEl.pause();
-      });
-    }
-  });
-
-  // Alternative approach if SeeWav doesn't have event listeners
-  // Add click handlers to waveform containers
-  document.querySelectorAll('[id^="waveform-"]').forEach(container => {
-    container.addEventListener('click', (e) => {
-      const rect = container.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      const progress = clickX / rect.width;
-      
-      // Find corresponding audio element
-      const waveformId = container.id;
-      const audioId = waveformId.replace('waveform-', 'audio-');
-      const audioEl = document.getElementById(audioId);
-      
-      if (audioEl && audioEl.duration) {
-        audioEl.currentTime = progress * audioEl.duration;
-      }
-    });
-  });
-});
-</script>
-
-<script>
 // Function to load CSV data
 async function loadCSV(url) {
   const response = await fetch(url);
@@ -1697,12 +1590,10 @@ async function initChart() {
     console.log('Loading CSV files...');
     // Load both CSV files
     const baselineData = await loadCSV('static/graphs/frechet_loss/tensorboard_logs_version_180.csv');
-    const ctcData = await loadCSV('static/graphs/frechet_loss/tensorboard_logs_version_181.csv');
+    const midiffData = await loadCSV('static/graphs/frechet_loss/tensorboard_logs_version_181.csv');
     
     console.log('Baseline data:', baselineData.length, 'points');
-    console.log('CTC data:', ctcData.length, 'points');
-    console.log('Sample baseline data:', baselineData.slice(0, 3));
-    console.log('Sample CTC data:', ctcData.slice(0, 3));
+    console.log('MiDiff data:', midiffData.length, 'points');
 
     const chartElement = document.getElementById('frechetChart');
     console.log('Chart element found:', chartElement);
@@ -1720,7 +1611,7 @@ async function initChart() {
       type: 'line',
       data: {
         datasets: [{
-          label: 'Baseline Model',
+          label: 'Baseline (no MIDI)',
           data: baselineData.map(row => ({
             x: (row.Step / STEPS_PER_EPOCH) - 1,
             y: row.Value
@@ -1731,8 +1622,8 @@ async function initChart() {
           pointRadius: 4,
           pointHoverRadius: 6
         }, {
-          label: 'Midi Conditioned Model',
-          data: ctcData.map(row => ({
+          label: 'MiDiff (MIDI-conditioned)',
+          data: midiffData.map(row => ({
             x: (row.Step / STEPS_PER_EPOCH) - 1,
             y: row.Value
           })),
@@ -1767,14 +1658,14 @@ async function initChart() {
             type: 'logarithmic',
             title: {
               display: true,
-              text: 'Frechet VGGish Score'
+              text: 'FAD (validation)'
             }
           }
         },
         plugins: {
           title: {
             display: true,
-            text: 'Frechet VGGish Score Comparison During Training'
+            text: 'Fréchet Audio Distance during training'
           },
           legend: {
             display: true,
@@ -1827,10 +1718,11 @@ document.addEventListener('DOMContentLoaded', function() {
   if (!canvas || !window.Chart) return;
 
   const labels = ['Baseline', 'MiDiff', 'MiDiff (Random Velocity)', '0', '1', '20', '40', '60', '80', '100', '127'];
-  const baseline =      [0.4797, null,   null,                     null, null,  null,  null,  null,  null,  null,   null];
-  const midiff =        [null,   0.3923, null,                     null, null,  null,  null,  null,  null,  null,   null];
-  const randomVel =     [null,   null,   14.824064,                null, null,  null,  null,  null,  null,  null,   null];
-  const constantVel =   [null,   null,   null,                     15.052656, 14.930122, 1.45304, 0.628265, 0.62716, 0.607096, 0.631502, 0.628135];
+  /* Validation FAD from paper (StemGMD); constant-velocity mids ~0.62 for 40–127 per table */
+  const baseline =      [0.5603, null,   null,                     null, null,  null,  null,  null,  null,  null,   null];
+  const midiff =        [null,   0.2879, null,                     null, null,  null,  null,  null,  null,  null,   null];
+  const randomVel =     [null,   null,   1.7646,                   null, null,  null,  null,  null,  null,  null,   null];
+  const constantVel =   [null,   null,   null,                     15.05, 14.93, 1.45, 0.62, 0.62, 0.62, 0.62, 0.62];
 
   const ctx = canvas.getContext('2d');
   new Chart(ctx, {
