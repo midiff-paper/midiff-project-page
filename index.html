@@ -255,7 +255,6 @@
             Bridging the semantic gap between perfect symbolic musical structure and severely degraded acoustic signals offers a powerful new paradigm for high-fidelity audio restoration.
             In this work, we introduce MiDiff, a diffusion-based generative model for drum audio enhancement that conditions the reverse process on temporally aligned MIDI piano rolls. We extend the Score-Based Generative Models for Speech Enhancement (SGMSE) framework in the complex STFT domain by integrating a pretrained MIDI encoder, multi-scale temporal alignment, and three complementary conditioning strategies: early injection, Feature-wise Linear Modulation (FiLM), and cross-attention. To enforce structural fidelity and control the conditioning strength, we investigate two separate guidance mechanisms: classifier guidance driven by an Automatic Drum Transcription (ADT) model, and classifier-free guidance. We train our model on the StemGMD dataset using a non-additive degradation pipeline that simulates room acoustics, electret capsule response, and codec compression. MiDiff achieves a Fréchet Audio Distance (FAD) of 0.29, substantially outperforming the audio-only baseline (0.56). Ablation studies demonstrate that combining all three conditioning strategies yields the best results and that authentic MIDI velocity dynamics are critical for effective symbolic conditioning. 
             Our method demonstrates the immense potential of leveraging symbolic priors to reconstruct high-fidelity percussive audio.
-            Qualitative results and audio demonstrations are available on this companion page: <a href="https://midiff-paper.github.io/midiff-project-page/">midiff-paper.github.io/midiff-project-page</a> (also cited in our ISMIR submission).
           </p>
         </div>
       </div>
@@ -1497,7 +1496,7 @@
         <h2 class="title is-3" style="margin-top: 2rem;">Conclusion</h2>
         <div class="content has-text-justified">
           <p>
-            We introduced MiDiff, a MIDI-conditioned diffusion framework for drum enhancement that bridges symbolic and acoustic representations via early injection, FiLM, and cross-attention, with classifier-free guidance at inference to control conditioning strength without an external classifier. On StemGMD, MiDiff reaches FAD <strong>0.29</strong> vs. <strong>0.56</strong> for the audio-only baseline; ablations show all three conditioning paths together work best and that authentic MIDI velocities matter. Future work includes extending the framework toward automatic transcription and other instruments. This companion site hosts qualitative audio and figures referenced in our ISMIR submission.
+            We introduced MiDiff, a MIDI-conditioned diffusion framework for drum enhancement that bridges symbolic and acoustic representations via early injection, FiLM, and cross-attention, with classifier-free guidance at inference to control conditioning strength without an external classifier. On StemGMD, MiDiff reaches FAD <strong>0.29</strong> vs. <strong>0.56</strong> for the audio-only baseline; ablations show all three conditioning paths together work best and that authentic MIDI velocities matter. Future work includes extending the framework toward automatic transcription and other instruments.
           </p>
         </div>
       </div>
