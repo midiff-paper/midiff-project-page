@@ -34,15 +34,17 @@
   <rect x="3" y="3" width="90" height="90" rx="19" fill="none" stroke="url(#mdBorder)" stroke-width="2" opacity="0.9"/>
 
   <g filter="url(#mdDrop)">
-    <text
-      x="48"
-      y="62"
-      text-anchor="middle"
-      dominant-baseline="middle"
-      font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-      font-weight="800"
-      font-size="44"
-      letter-spacing="-0.04em"
-      fill="url(#mdLetter)">Mi</text>
+    <g transform="translate(48, 48)">
+      <text
+        x="0"
+        y="0"
+        text-anchor="middle"
+        dominant-baseline="middle"
+        font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+        font-weight="800"
+        font-size="44"
+        letter-spacing="-0.04em"
+        fill="url(#mdLetter)">Mi</text>
+    </g>
   </g>
 </svg>
