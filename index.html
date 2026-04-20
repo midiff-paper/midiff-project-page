@@ -173,6 +173,8 @@
     }
     .chart-card-modern {
       position: relative;
+      width: 100%;
+      box-sizing: border-box;
       border-radius: 16px;
       background: linear-gradient(165deg, #ffffff 0%, #f8fafc 55%, #f1f5f9 100%);
       border: 1px solid rgba(148, 163, 184, 0.4);
@@ -233,10 +235,12 @@
       line-height: 1.55;
     }
     .tool-file-select-wrap {
+      width: 100%;
+      max-width: 100%;
       margin-bottom: 1rem;
-      max-width: 520px;
       margin-left: auto;
       margin-right: auto;
+      box-sizing: border-box;
     }
     .tool-file-select-wrap label {
       font-weight: 600;
@@ -257,9 +261,21 @@
       box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
       margin-bottom: 1rem;
     }
+    .tool-compare-row {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      width: 100%;
+      align-items: stretch;
+      justify-content: center;
+      box-sizing: border-box;
+    }
     .tool-compare-panel {
-      width: 350px;
-      max-width: 100%;
+      flex: 1 1 calc(50% - 0.5rem);
+      min-width: min(100%, 260px);
+      width: auto;
+      max-width: none;
+      box-sizing: border-box;
       background: rgba(255, 255, 255, 0.92);
       border-radius: 12px;
       padding: 12px;
@@ -280,8 +296,16 @@
       white-space: nowrap;
       height: 160px;
       width: 100%;
-      max-width: 340px;
+      max-width: 100%;
+      box-sizing: border-box;
       cursor: grab;
+    }
+    .tool-panel-audio {
+      width: 100%;
+      max-width: 100%;
+      height: 36px;
+      margin-top: 8px;
+      display: block;
     }
     .tool-spectrogram-frame--baseline {
       border: 2px solid rgba(225, 29, 72, 0.5);
@@ -290,12 +314,14 @@
       border: 2px solid rgba(14, 165, 233, 0.58);
     }
     .tool-preview-panel {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
       background: rgba(255, 255, 255, 0.92);
       border-radius: 12px;
       padding: 12px;
       box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
       border: 1px solid rgba(148, 163, 184, 0.28);
-      max-width: 360px;
       margin-left: auto;
       margin-right: auto;
     }
@@ -1137,7 +1163,7 @@
 
     <!-- Interactive Epoch Comparison Tool -->
     <div class="columns is-centered">
-      <div class="column is-full" style="max-width: 1200px; padding: 0 2rem;">
+      <div class="column is-four-fifths">
         <div class="chart-card-modern">
           <h4 class="title is-5 tool-section-title">
             <span class="icon"><i class="fas fa-sliders-h"></i></span>
@@ -1161,14 +1187,14 @@
             </select>
           </div>
           
-          <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+          <div class="tool-compare-row">
             <!-- Left comparison panel = Baseline -->
             <div class="tool-compare-panel tool-compare-panel--baseline">
               <div class="tool-compare-panel__label">Baseline</div>
               <div id="epoch-compare-left-container" class="epoch-compare-sync-group tool-spectrogram-frame tool-spectrogram-frame--baseline">
-                <img id="epoch-compare-left-img" src="static/images/baseline_v180_drummer1_1_funk-groove1_138_beat_4-4_bluebird.png" alt="Left Comparison" class="epoch-compare-img" style="height: 156px; width: auto; max-width: 340px; display: inline-block;">
+                <img id="epoch-compare-left-img" src="static/images/baseline_v180_drummer1_1_funk-groove1_138_beat_4-4_bluebird.png" alt="Left Comparison" class="epoch-compare-img" style="height: 156px; width: auto; display: inline-block;">
               </div>
-              <audio id="epoch-compare-left-audio" controls style="width: 100%; max-width: 360px; height: 36px; margin-top: 8px; display: block;">
+              <audio id="epoch-compare-left-audio" controls class="tool-panel-audio">
                 <source id="epoch-compare-left-audio-src" src="static/audio/baseline/version_180_last5/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav" type="audio/wav">
               </audio>
             </div>
@@ -1177,9 +1203,9 @@
             <div class="tool-compare-panel tool-compare-panel--midiff">
               <div class="tool-compare-panel__label">MiDiff</div>
               <div id="epoch-compare-right-container" class="epoch-compare-sync-group tool-spectrogram-frame tool-spectrogram-frame--midiff">
-                <img id="epoch-compare-right-img" src="static/images/midiff_v181_drummer1_1_funk-groove1_138_beat_4-4_bluebird.png" alt="Right Comparison" class="epoch-compare-img" style="height: 156px; width: auto; max-width: 340px; display: inline-block;">
+                <img id="epoch-compare-right-img" src="static/images/midiff_v181_drummer1_1_funk-groove1_138_beat_4-4_bluebird.png" alt="Right Comparison" class="epoch-compare-img" style="height: 156px; width: auto; display: inline-block;">
               </div>
-              <audio id="epoch-compare-right-audio" controls style="width: 100%; max-width: 360px; height: 36px; margin-top: 8px; display: block;">
+              <audio id="epoch-compare-right-audio" controls class="tool-panel-audio">
                 <source id="epoch-compare-right-audio-src" src="static/audio/midi_conditioned/version_181_last5/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav" type="audio/wav">
               </audio>
             </div>
@@ -1289,23 +1315,35 @@
       applyEpochCompareZoom();
     }
 
-    const EPOCH_COMPARE_BASE_WIDTH = 350;
+    function getEpochCompareBaseWidth() {
+      const el = document.getElementById('epoch-compare-left-container');
+      if (el && el.clientWidth > 48) return el.clientWidth;
+      return 350;
+    }
     function applyEpochCompareZoom() {
-      document.getElementById('epoch-compare-zoom-level').textContent = Math.round(epochCompareZoomLevel * 100) + '%';
-      
+      const zl = document.getElementById('epoch-compare-zoom-level');
+      if (zl) zl.textContent = Math.round(epochCompareZoomLevel * 100) + '%';
+      const baseW = getEpochCompareBaseWidth();
       document.querySelectorAll('.epoch-compare-img').forEach(img => {
         img.style.height = (156 * epochCompareZoomLevel) + 'px';
-        img.style.maxWidth = (EPOCH_COMPARE_BASE_WIDTH * epochCompareZoomLevel) + 'px';
+        img.style.maxWidth = (baseW * epochCompareZoomLevel) + 'px';
       });
-      
       document.querySelectorAll('.epoch-compare-sync-group').forEach(container => {
         container.style.height = (160 * epochCompareZoomLevel) + 'px';
       });
     }
+    let _epochCompareResizeTimer;
+    window.addEventListener('resize', function() {
+      clearTimeout(_epochCompareResizeTimer);
+      _epochCompareResizeTimer = setTimeout(applyEpochCompareZoom, 120);
+    });
 
     // Setup synchronized scrolling for epoch comparison tool
     document.addEventListener('DOMContentLoaded', function() {
       applyEpochCompareZoom();
+      requestAnimationFrame(function() {
+        requestAnimationFrame(applyEpochCompareZoom);
+      });
       const epochCompareContainers = document.querySelectorAll('.epoch-compare-sync-group');
       let isEpochCompareScrolling = false;
 
@@ -1660,9 +1698,9 @@
           
             <div class="tool-preview-panel">
               <div id="velocity-sweep-spectrogram-container" class="velocity-sweep-spectrogram-group tool-spectrogram-frame tool-spectrogram-frame--accent">
-                <img id="velocity-sweep-img" class="velocity-sweep-spectrogram-img" src="static/images/velocity_sweep_v181_velocity_127.png" alt="Spectrogram" style="height: 156px; width: auto; max-width: 340px; display: inline-block;">
+                <img id="velocity-sweep-img" class="velocity-sweep-spectrogram-img" src="static/images/velocity_sweep_v181_velocity_127.png" alt="Spectrogram" style="height: 156px; width: auto; display: inline-block;">
               </div>
-              <audio id="velocity-sweep-audio" controls style="width: 100%; max-width: 360px; height: 36px; margin-top: 8px; display: block;">
+              <audio id="velocity-sweep-audio" controls class="tool-panel-audio">
                 <source id="velocity-sweep-audio-src" src="static/audio/midi_conditioned/velocity_sweep_v181_last5/velocity_127/drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav" type="audio/wav">
               </audio>
             </div>
@@ -1698,7 +1736,11 @@
           const VELOCITY_SWEEP_MIN_ZOOM = 1.0;
           const VELOCITY_SWEEP_MAX_ZOOM = 4.0;
           const VELOCITY_SWEEP_BASE_HEIGHT = 156;
-          const VELOCITY_SWEEP_BASE_WIDTH = 340;
+          function getVelocitySweepBaseWidth() {
+            const c = document.getElementById('velocity-sweep-spectrogram-container');
+            if (c && c.clientWidth > 48) return c.clientWidth;
+            return 340;
+          }
 
           function updateVelocitySweep() {
             const select = document.getElementById('velocity-sweep-select');
@@ -1728,15 +1770,24 @@
             const img = document.getElementById('velocity-sweep-img');
             const container = document.getElementById('velocity-sweep-spectrogram-container');
             if (zoomEl) zoomEl.textContent = Math.round(velocitySweepZoomLevel * 100) + '%';
+            const bw = getVelocitySweepBaseWidth();
             if (img) {
               img.style.height = (VELOCITY_SWEEP_BASE_HEIGHT * velocitySweepZoomLevel) + 'px';
-              img.style.maxWidth = (VELOCITY_SWEEP_BASE_WIDTH * velocitySweepZoomLevel) + 'px';
+              img.style.maxWidth = (bw * velocitySweepZoomLevel) + 'px';
             }
             if (container) container.style.height = (160 * velocitySweepZoomLevel) + 'px';
           }
+          let _velocitySweepResizeTimer;
+          window.addEventListener('resize', function() {
+            clearTimeout(_velocitySweepResizeTimer);
+            _velocitySweepResizeTimer = setTimeout(applyVelocitySweepZoom, 120);
+          });
 
           document.addEventListener('DOMContentLoaded', function() {
             applyVelocitySweepZoom();
+            requestAnimationFrame(function() {
+              requestAnimationFrame(applyVelocitySweepZoom);
+            });
             const select = document.getElementById('velocity-sweep-select');
             if (select) select.addEventListener('change', updateVelocitySweep);
 
