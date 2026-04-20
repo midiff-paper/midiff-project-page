@@ -325,6 +325,10 @@
       margin-left: auto;
       margin-right: auto;
     }
+    /* Velocity sweep: keep spectrogram readable (not full column width) */
+    .tool-preview-panel--velocity {
+      max-width: 360px;
+    }
     .tool-spectrogram-frame--accent {
       border: 2px solid rgba(14, 165, 233, 0.58);
     }
@@ -1696,7 +1700,7 @@
               <option value="random_velocity">Random Velocity</option>
             </select>
           
-            <div class="tool-preview-panel">
+            <div class="tool-preview-panel tool-preview-panel--velocity">
               <div id="velocity-sweep-spectrogram-container" class="velocity-sweep-spectrogram-group tool-spectrogram-frame tool-spectrogram-frame--accent">
                 <img id="velocity-sweep-img" class="velocity-sweep-spectrogram-img" src="static/images/velocity_sweep_v181_velocity_127.png" alt="Spectrogram" style="height: 156px; width: auto; display: inline-block;">
               </div>
