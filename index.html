@@ -213,6 +213,193 @@
       accent-color: #0ea5e9;
       cursor: pointer;
     }
+
+    /* Interactive tools (FAD comparison, velocity sweep) — match chart cards */
+    .tool-section-title {
+      margin-bottom: 0.65rem !important;
+      color: #0f172a !important;
+      font-weight: 600 !important;
+      letter-spacing: -0.02em;
+    }
+    .tool-section-title .icon {
+      color: #0284c7 !important;
+      vertical-align: middle;
+      margin-right: 0.35rem;
+    }
+    .tool-card-lead {
+      font-size: 0.9rem;
+      color: #64748b;
+      margin-bottom: 1.1rem;
+      line-height: 1.55;
+    }
+    .tool-file-select-wrap {
+      margin-bottom: 1rem;
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .tool-file-select-wrap label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #475569;
+      margin-bottom: 0.45rem;
+      display: block;
+      text-align: center;
+    }
+    .tool-file-select-wrap select {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      font-size: 0.9rem;
+      color: #334155;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      margin-bottom: 1rem;
+    }
+    .tool-compare-panel {
+      width: 350px;
+      max-width: 100%;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+    }
+    .tool-compare-panel__label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .tool-compare-panel--baseline .tool-compare-panel__label { color: #be123c; }
+    .tool-compare-panel--midiff .tool-compare-panel__label { color: #0369a1; }
+    .tool-spectrogram-frame {
+      border-radius: 10px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+      height: 160px;
+      width: 100%;
+      max-width: 340px;
+      cursor: grab;
+    }
+    .tool-spectrogram-frame--baseline {
+      border: 2px solid rgba(225, 29, 72, 0.5);
+    }
+    .tool-spectrogram-frame--midiff {
+      border: 2px solid rgba(14, 165, 233, 0.58);
+    }
+    .tool-preview-panel {
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      max-width: 360px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .tool-spectrogram-frame--accent {
+      border: 2px solid rgba(14, 165, 233, 0.58);
+    }
+    .tool-actions-row {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .tool-btn-sync {
+      padding: 0.5rem 1.15rem;
+      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.875rem;
+      box-shadow: 0 2px 10px rgba(14, 165, 233, 0.35);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .tool-btn-sync:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(14, 165, 233, 0.38);
+    }
+    .tool-btn-sync.is-off {
+      background: linear-gradient(180deg, #94a3b8 0%, #64748b 100%);
+      box-shadow: 0 2px 8px rgba(100, 116, 139, 0.35);
+    }
+    .tool-btn-sync.is-off:hover {
+      box-shadow: 0 4px 14px rgba(100, 116, 139, 0.42);
+    }
+    .tool-zoom-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+    }
+    .tool-zoom-label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #475569;
+    }
+    .tool-zoom-toolbar .tool-zoom-step {
+      width: 32px;
+      height: 32px;
+      background: #f1f5f9;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #475569;
+      line-height: 1;
+      transition: background 0.15s ease;
+    }
+    .tool-zoom-toolbar .tool-zoom-step:hover {
+      background: #e2e8f0;
+    }
+    .tool-zoom-toolbar .tool-zoom-level {
+      min-width: 52px;
+      text-align: center;
+      font-weight: 600;
+      color: #475569;
+      font-size: 0.875rem;
+    }
+    .tool-zoom-toolbar .tool-zoom-reset {
+      padding: 4px 12px;
+      height: auto;
+      width: auto;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: #64748b;
+      border-color: #64748b;
+      color: #fff;
+    }
+    .tool-zoom-toolbar .tool-zoom-reset:hover {
+      background: #475569;
+      border-color: #475569;
+    }
+    .tool-tip-footer {
+      font-size: 0.8rem;
+      color: #64748b;
+      text-align: center;
+      margin-top: 0.75rem;
+    }
+    .tool-tip-footer kbd {
+      background: #f1f5f9;
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      font-size: 0.75rem;
+      color: #475569;
+    }
     
     /* Footer styling */
     .footer {
@@ -951,16 +1138,16 @@
     <!-- Interactive Epoch Comparison Tool -->
     <div class="columns is-centered">
       <div class="column is-full" style="max-width: 1200px; padding: 0 2rem;">
-        <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 1.5rem; border-radius: 12px; border: 2px solid #dee2e6;">
-          <h4 class="title is-5" style="margin-bottom: 1rem; color: #495057;">
-            <span class="icon" style="color: #3b82f6;"><i class="fas fa-sliders-h"></i></span>
+        <div class="chart-card-modern">
+          <h4 class="title is-5 tool-section-title">
+            <span class="icon"><i class="fas fa-sliders-h"></i></span>
             Best FAD Comparison Tool
           </h4>
-          <p style="font-size: 0.9rem; color: #6c757d; margin-bottom: 1rem;">Compare baseline vs. MiDiff outputs. Select an audio file to compare side-by-side.</p>
+          <p class="tool-card-lead">Compare baseline vs. MiDiff outputs. Select an audio file to compare side-by-side.</p>
           
-          <div style="margin-bottom: 1rem; max-width: 500px; margin-left: auto; margin-right: auto;">
-            <label style="font-weight: 600; font-size: 0.85rem; color: #495057; margin-bottom: 0.5rem; display: block; text-align: left; margin-left: -110px;">Audio file:</label>
-            <select id="epoch-compare-select" onchange="updateEpochComparison()" style="width: 100%; max-width: 500px; padding: 8px 12px; border-radius: 6px; border: 1px solid #ced4da; font-size: 0.9rem; margin-left: -110px; display: block;">
+          <div class="tool-file-select-wrap">
+            <label for="epoch-compare-select">Audio file</label>
+            <select id="epoch-compare-select" onchange="updateEpochComparison()">
               <option value="drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav" selected>drummer1_1_funk-groove1_138_beat_4-4_bluebird.wav</option>
               <option value="drummer1_2_funk-groove2_105_beat_4-4_brooklyn.wav">drummer1_2_funk-groove2_105_beat_4-4_brooklyn.wav</option>
               <option value="drummer1_3_soul-groove3_86_beat_4-4_detroit_garage.wav">drummer1_3_soul-groove3_86_beat_4-4_detroit_garage.wav</option>
@@ -976,9 +1163,9 @@
           
           <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
             <!-- Left comparison panel = Baseline -->
-            <div style="width: 350px; max-width: 100%; background: white; border-radius: 8px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-              <div style="font-size: 0.95rem; font-weight: 600; color: #c92a2a; margin-bottom: 8px;">Baseline</div>
-              <div id="epoch-compare-left-container" class="epoch-compare-sync-group" style="border: 2px solid #ff6b6b; border-radius: 8px; overflow-x: auto; overflow-y: hidden; white-space: nowrap; height: 160px; width: 100%; max-width: 340px; cursor: grab;">
+            <div class="tool-compare-panel tool-compare-panel--baseline">
+              <div class="tool-compare-panel__label">Baseline</div>
+              <div id="epoch-compare-left-container" class="epoch-compare-sync-group tool-spectrogram-frame tool-spectrogram-frame--baseline">
                 <img id="epoch-compare-left-img" src="static/images/baseline_v180_drummer1_1_funk-groove1_138_beat_4-4_bluebird.png" alt="Left Comparison" class="epoch-compare-img" style="height: 156px; width: auto; max-width: 340px; display: inline-block;">
               </div>
               <audio id="epoch-compare-left-audio" controls style="width: 100%; max-width: 360px; height: 36px; margin-top: 8px; display: block;">
@@ -987,9 +1174,9 @@
             </div>
             
             <!-- Right comparison panel = MiDiff -->
-            <div style="width: 350px; max-width: 100%; background: white; border-radius: 8px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-              <div style="font-size: 0.95rem; font-weight: 600; color: #1e40af; margin-bottom: 8px;">MiDiff</div>
-              <div id="epoch-compare-right-container" class="epoch-compare-sync-group" style="border: 2px solid #3b82f6; border-radius: 8px; overflow-x: auto; overflow-y: hidden; white-space: nowrap; height: 160px; width: 100%; max-width: 340px; cursor: grab;">
+            <div class="tool-compare-panel tool-compare-panel--midiff">
+              <div class="tool-compare-panel__label">MiDiff</div>
+              <div id="epoch-compare-right-container" class="epoch-compare-sync-group tool-spectrogram-frame tool-spectrogram-frame--midiff">
                 <img id="epoch-compare-right-img" src="static/images/midiff_v181_drummer1_1_funk-groove1_138_beat_4-4_bluebird.png" alt="Right Comparison" class="epoch-compare-img" style="height: 156px; width: auto; max-width: 340px; display: inline-block;">
               </div>
               <audio id="epoch-compare-right-audio" controls style="width: 100%; max-width: 360px; height: 36px; margin-top: 8px; display: block;">
@@ -998,21 +1185,21 @@
             </div>
           </div>
           
-          <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; align-items: center;">
-            <button id="epoch-compare-sync-btn" onclick="toggleEpochCompareSync()" style="padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s;">
+          <div class="tool-actions-row">
+            <button type="button" id="epoch-compare-sync-btn" class="tool-btn-sync" onclick="toggleEpochCompareSync()">
               <i class="fas fa-link"></i> Sync Scrolling: ON
             </button>
             
-            <div style="display: flex; align-items: center; gap: 8px; background: white; padding: 6px 12px; border-radius: 6px; border: 1px solid #ced4da;">
-              <span style="font-weight: 600; font-size: 0.85rem; color: #495057;"><i class="fas fa-search"></i> Zoom:</span>
-              <button onclick="zoomEpochCompare(-0.25)" style="width: 32px; height: 32px; background: #e9ecef; border: 1px solid #ced4da; border-radius: 4px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">−</button>
-              <span id="epoch-compare-zoom-level" style="min-width: 50px; text-align: center; font-weight: 600; color: #495057;">200%</span>
-              <button onclick="zoomEpochCompare(0.25)" style="width: 32px; height: 32px; background: #e9ecef; border: 1px solid #ced4da; border-radius: 4px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">+</button>
-              <button onclick="resetEpochCompareZoom()" style="padding: 4px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">Reset</button>
+            <div class="tool-zoom-toolbar">
+              <span class="tool-zoom-label"><i class="fas fa-search"></i> Zoom</span>
+              <button type="button" class="tool-zoom-step" onclick="zoomEpochCompare(-0.25)" aria-label="Zoom out">−</button>
+              <span id="epoch-compare-zoom-level" class="tool-zoom-level">200%</span>
+              <button type="button" class="tool-zoom-step" onclick="zoomEpochCompare(0.25)" aria-label="Zoom in">+</button>
+              <button type="button" class="tool-zoom-step tool-zoom-reset" onclick="resetEpochCompareZoom()">Reset</button>
             </div>
           </div>
           
-          <p style="font-size: 0.8rem; color: #6c757d; text-align: center; margin-top: 0.75rem;"><i class="fas fa-info-circle"></i> Tip: Use mouse wheel while holding <kbd style="background: #e9ecef; padding: 2px 6px; border-radius: 3px; border: 1px solid #ced4da;">Ctrl</kbd> to zoom, or scroll horizontally to pan.</p>
+          <p class="tool-tip-footer"><i class="fas fa-info-circle"></i> Tip: Use mouse wheel while holding <kbd>Ctrl</kbd> to zoom, or scroll horizontally to pan.</p>
         </div>
 
       </div>
@@ -1085,10 +1272,10 @@
       const btn = document.getElementById('epoch-compare-sync-btn');
       if (epochCompareSyncEnabled) {
         btn.innerHTML = '<i class="fas fa-link"></i> Sync Scrolling: ON';
-        btn.style.background = '#3b82f6';
+        btn.classList.remove('is-off');
       } else {
         btn.innerHTML = '<i class="fas fa-unlink"></i> Sync Scrolling: OFF';
-        btn.style.background = '#6c757d';
+        btn.classList.add('is-off');
       }
     }
 
@@ -1450,16 +1637,16 @@
         </div>
 
         <!-- Velocity Sweep: Selection + single spectrogram and player (last 5 seconds) -->
-        <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 1.5rem; border-radius: 12px; border: 2px solid #dee2e6; margin-top: 1.5rem;">
-          <h4 class="title is-5" style="margin-bottom: 1rem; color: #495057;">
-            <span class="icon" style="color: #3b82f6;"><i class="fas fa-sliders-h"></i></span>
+        <div class="chart-card-modern" style="margin-top: 1.5rem;">
+          <h4 class="title is-5 tool-section-title">
+            <span class="icon"><i class="fas fa-sliders-h"></i></span>
             Velocity Sweep
           </h4>
-          <p style="font-size: 0.9rem; color: #6c757d; margin-bottom: 1rem;">Select a velocity condition to view its spectrogram and listen. Source: drummer1_1_funk-groove1_138_beat_4-4_bluebird (last 5 seconds).</p>
+          <p class="tool-card-lead">Select a velocity condition to view its spectrogram and listen. Source: drummer1_1_funk-groove1_138_beat_4-4_bluebird (last 5 seconds).</p>
           
-          <div style="width: 350px; max-width: 100%; margin-left: auto; margin-right: auto;">
-            <label style="font-weight: 600; font-size: 0.85rem; color: #495057; margin-bottom: 0.5rem; display: block;">Velocity condition:</label>
-            <select id="velocity-sweep-select" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid #ced4da; font-size: 0.9rem; margin-bottom: 1rem;">
+          <div class="tool-file-select-wrap">
+            <label for="velocity-sweep-select">Velocity condition</label>
+            <select id="velocity-sweep-select">
               <option value="velocity_0">Velocity 0</option>
               <option value="velocity_1">Velocity 1</option>
               <option value="velocity_20">Velocity 20</option>
@@ -1471,8 +1658,8 @@
               <option value="random_velocity">Random Velocity</option>
             </select>
           
-            <div style="background: white; border-radius: 8px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-              <div id="velocity-sweep-spectrogram-container" class="velocity-sweep-spectrogram-group" style="border: 2px solid #3b82f6; border-radius: 8px; overflow-x: auto; overflow-y: hidden; white-space: nowrap; height: 160px; width: 100%; max-width: 340px; cursor: grab;">
+            <div class="tool-preview-panel">
+              <div id="velocity-sweep-spectrogram-container" class="velocity-sweep-spectrogram-group tool-spectrogram-frame tool-spectrogram-frame--accent">
                 <img id="velocity-sweep-img" class="velocity-sweep-spectrogram-img" src="static/images/velocity_sweep_v181_velocity_127.png" alt="Spectrogram" style="height: 156px; width: auto; max-width: 340px; display: inline-block;">
               </div>
               <audio id="velocity-sweep-audio" controls style="width: 100%; max-width: 360px; height: 36px; margin-top: 8px; display: block;">
@@ -1481,17 +1668,17 @@
             </div>
           </div>
           
-          <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; align-items: center;">
-            <div style="display: flex; align-items: center; gap: 8px; background: white; padding: 6px 12px; border-radius: 6px; border: 1px solid #ced4da;">
-              <span style="font-weight: 600; font-size: 0.85rem; color: #495057;"><i class="fas fa-search"></i> Zoom:</span>
-              <button id="velocity-sweep-zoom-minus" style="width: 32px; height: 32px; background: #e9ecef; border: 1px solid #ced4da; border-radius: 4px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">−</button>
-              <span id="velocity-sweep-zoom-level" style="min-width: 50px; text-align: center; font-weight: 600; color: #495057;">200%</span>
-              <button id="velocity-sweep-zoom-plus" style="width: 32px; height: 32px; background: #e9ecef; border: 1px solid #ced4da; border-radius: 4px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">+</button>
-              <button id="velocity-sweep-zoom-reset" style="padding: 4px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">Reset</button>
+          <div class="tool-actions-row">
+            <div class="tool-zoom-toolbar">
+              <span class="tool-zoom-label"><i class="fas fa-search"></i> Zoom</span>
+              <button type="button" id="velocity-sweep-zoom-minus" class="tool-zoom-step" aria-label="Zoom out">−</button>
+              <span id="velocity-sweep-zoom-level" class="tool-zoom-level">200%</span>
+              <button type="button" id="velocity-sweep-zoom-plus" class="tool-zoom-step" aria-label="Zoom in">+</button>
+              <button type="button" id="velocity-sweep-zoom-reset" class="tool-zoom-step tool-zoom-reset">Reset</button>
             </div>
           </div>
           
-          <p style="font-size: 0.8rem; color: #6c757d; text-align: center; margin-top: 0.75rem;"><i class="fas fa-info-circle"></i> Tip: Use mouse wheel while holding <kbd style="background: #e9ecef; padding: 2px 6px; border-radius: 3px; border: 1px solid #ced4da;">Ctrl</kbd> to zoom, or scroll horizontally to pan.</p>
+          <p class="tool-tip-footer"><i class="fas fa-info-circle"></i> Tip: Use mouse wheel while holding <kbd>Ctrl</kbd> to zoom, or scroll horizontally to pan.</p>
         </div>
 
         <script>
