@@ -325,9 +325,23 @@
       margin-left: auto;
       margin-right: auto;
     }
-    /* Velocity sweep: keep spectrogram readable (not full column width) */
-    .tool-preview-panel--velocity {
-      max-width: 360px;
+    /* Velocity sweep: dropdown + spectrogram share one width */
+    .tool-velocity-stack {
+      width: 100%;
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+      box-sizing: border-box;
+    }
+    .tool-velocity-stack .tool-file-select-wrap {
+      margin-bottom: 0.5rem;
+    }
+    .tool-velocity-stack .tool-file-select-wrap label {
+      text-align: left;
+    }
+    .tool-velocity-stack .tool-preview-panel {
+      margin-left: 0;
+      margin-right: 0;
     }
     .tool-spectrogram-frame--accent {
       border: 2px solid rgba(14, 165, 233, 0.58);
@@ -1686,21 +1700,22 @@
           </h4>
           <p class="tool-card-lead">Select a velocity condition to view its spectrogram and listen. Source: drummer1_1_funk-groove1_138_beat_4-4_bluebird (last 5 seconds).</p>
           
-          <div class="tool-file-select-wrap">
-            <label for="velocity-sweep-select">Velocity condition</label>
-            <select id="velocity-sweep-select">
-              <option value="velocity_0">Velocity 0</option>
-              <option value="velocity_1">Velocity 1</option>
-              <option value="velocity_20">Velocity 20</option>
-              <option value="velocity_40">Velocity 40</option>
-              <option value="velocity_60">Velocity 60</option>
-              <option value="velocity_80">Velocity 80</option>
-              <option value="velocity_100">Velocity 100</option>
-              <option value="velocity_127" selected>Velocity 127</option>
-              <option value="random_velocity">Random Velocity</option>
-            </select>
-          
-            <div class="tool-preview-panel tool-preview-panel--velocity">
+          <div class="tool-velocity-stack">
+            <div class="tool-file-select-wrap">
+              <label for="velocity-sweep-select">Velocity condition</label>
+              <select id="velocity-sweep-select">
+                <option value="velocity_0">Velocity 0</option>
+                <option value="velocity_1">Velocity 1</option>
+                <option value="velocity_20">Velocity 20</option>
+                <option value="velocity_40">Velocity 40</option>
+                <option value="velocity_60">Velocity 60</option>
+                <option value="velocity_80">Velocity 80</option>
+                <option value="velocity_100">Velocity 100</option>
+                <option value="velocity_127" selected>Velocity 127</option>
+                <option value="random_velocity">Random Velocity</option>
+              </select>
+            </div>
+            <div class="tool-preview-panel">
               <div id="velocity-sweep-spectrogram-container" class="velocity-sweep-spectrogram-group tool-spectrogram-frame tool-spectrogram-frame--accent">
                 <img id="velocity-sweep-img" class="velocity-sweep-spectrogram-img" src="static/images/velocity_sweep_v181_velocity_127.png" alt="Spectrogram" style="height: 156px; width: auto; display: inline-block;">
               </div>
@@ -1743,7 +1758,7 @@
           function getVelocitySweepBaseWidth() {
             const c = document.getElementById('velocity-sweep-spectrogram-container');
             if (c && c.clientWidth > 48) return c.clientWidth;
-            return 340;
+            return 420;
           }
 
           function updateVelocitySweep() {
