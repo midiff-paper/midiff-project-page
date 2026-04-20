@@ -51,7 +51,6 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 1rem;
       margin: 0 auto 0.75rem;
       max-width: 52rem;
       padding: 0 0.75rem;
@@ -63,31 +62,6 @@
     .publication-hero-headline .publication-title {
       margin-bottom: 0 !important;
       line-height: 1.15;
-    }
-    @media screen and (min-width: 769px) {
-      .publication-hero-brand {
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-        gap: 1.35rem 1.75rem;
-        text-align: left;
-      }
-      .publication-hero-headline {
-        flex: 1 1 18rem;
-        min-width: 0;
-        width: auto;
-        text-align: left;
-      }
-    }
-    .publication-logo {
-      width: 5.75rem;
-      height: 5.75rem;
-      max-width: 100%;
-      object-fit: contain;
-      display: block;
-      flex-shrink: 0;
-      border-radius: 1.35rem;
-      box-shadow: 0 6px 22px rgba(15, 23, 42, 0.22);
     }
     
     .publication-authors {
@@ -515,7 +489,6 @@
         <div class="columns">
           <div class="column has-text-centered">
             <div class="publication-hero-brand">
-              <img class="publication-logo" src="static/images/midiff-logo.svg" width="112" height="112" alt="MiDiff — drums, MIDI conditioning, enhanced waveform"/>
               <div class="publication-hero-headline">
                 <h1 class="title is-1 publication-title">MiDiff: MIDI-Conditioned Diffusion Models for Drum Audio Enhancement</h1>
               </div>
