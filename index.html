@@ -166,6 +166,53 @@
     #BibTeX code {
       font-size: 0.85rem;
     }
+
+    /* Results FAD chart — modern card shell */
+    .results-chart-figure {
+      margin-top: 2rem;
+    }
+    .chart-card-modern {
+      position: relative;
+      border-radius: 16px;
+      background: linear-gradient(165deg, #ffffff 0%, #f8fafc 55%, #f1f5f9 100%);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.04),
+        0 12px 40px -12px rgba(15, 23, 42, 0.12);
+      padding: 1rem 1.25rem 1.25rem;
+      margin: 1.25rem 0;
+      overflow: hidden;
+    }
+    .chart-canvas-shell {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      margin-top: 0.35rem;
+    }
+    .chart-scale-toggle {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.45rem 0.85rem;
+      border-radius: 999px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: #475569;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+      cursor: pointer;
+      user-select: none;
+    }
+    .chart-scale-toggle input {
+      accent-color: #0ea5e9;
+      cursor: pointer;
+    }
     
     /* Footer styling */
     .footer {
@@ -878,17 +925,17 @@
           <p>We report <strong>Fréchet Audio Distance (FAD)</strong>, computed from VGGish embeddings following Kilgour et al.: a lower FAD indicates generated audio closer in distribution to clean references. Validation curves below compare our MIDI-conditioned MiDiff training run to the audio-only SGMSE baseline (StemGMD setup as in the paper).</p>
         </div>
         
-        <figure style="margin-top: 2rem;">
-          <div style="position: relative; width: 100%; height: 400px; margin: 20px 0;">
-            <div style="position: absolute; top: 10px; right: 10px; z-index: 10; background: white; padding: 8px 12px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid #e0e0e0;">
-              <label class="checkbox" style="margin: 0; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.9rem; color: #4a4a4a;">
-                <input type="checkbox" id="logScaleToggle" onchange="toggleLogScale()" checked style="cursor: pointer;">
-                <span>Log Scale</span>
-              </label>
+        <figure class="results-chart-figure">
+          <div id="frechet-chart-mount" class="chart-card-modern">
+            <label class="chart-scale-toggle">
+              <input type="checkbox" id="logScaleToggle" onchange="toggleLogScale()" checked>
+              <span>Log scale (y-axis)</span>
+            </label>
+            <div class="chart-canvas-shell">
+              <canvas id="frechetChart" aria-label="FAD versus training epoch for baseline and MiDiff"></canvas>
             </div>
-            <canvas id="frechetChart"></canvas>
           </div>
-          <figcaption style="text-align: center;"><strong>Figure 3:</strong> Interactive FAD vs. training epoch (log-scaled axis): baseline SGMSE vs. MiDiff (same preprocessing; see paper for hyperparameters).</figcaption>
+          <figcaption style="text-align: center; margin-top: 0.75rem;"><strong>Figure 3:</strong> Interactive FAD vs. training epoch (log-scaled axis): baseline SGMSE vs. MiDiff (same preprocessing; see paper for hyperparameters).</figcaption>
         </figure>
         
       </div>
@@ -1390,9 +1437,11 @@
           <p>
             To assess the impact of MIDI velocity information on model performance, we conducted an ablation study comparing two variants of our MIDI-conditioned diffusion model: one utilizing full MIDI data including velocity, and another using MIDI data with velocity information removed (i.e., all note velocities set to a constant value).
           </p>
-          <figure style="margin-top: 1.25rem;">
-            <div style="position: relative; width: 100%; height: 380px; margin: 12px 0;">
-              <canvas id="velocityAblationChart"></canvas>
+          <figure class="results-chart-figure" style="margin-top: 1.25rem;">
+            <div class="chart-card-modern" style="margin-bottom: 0;">
+              <div class="chart-canvas-shell" style="height: 380px;">
+                <canvas id="velocityAblationChart" aria-label="Velocity ablation FAD bar chart"></canvas>
+              </div>
             </div>
             <figcaption style="text-align: center;">
               <strong>Figure 4:</strong> Ablation study on velocity representation showing FAD scores for different configurations in log scale.
@@ -1609,32 +1658,41 @@ async function loadCSV(url) {
   return data;
 }
 
+/** Gradient fill under FAD curves (requires chartArea; safe on resize) */
+function fadDatasetFill(rgbStroke) {
+  return function(context) {
+    const chart = context.chart;
+    const { ctx, chartArea } = chart;
+    if (!chartArea) return 'transparent';
+    const g = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+    g.addColorStop(0, `rgba(${rgbStroke}, 0.32)`);
+    g.addColorStop(0.55, `rgba(${rgbStroke}, 0.08)`);
+    g.addColorStop(1, `rgba(${rgbStroke}, 0)`);
+    return g;
+  };
+}
+
 
 // Initialize the chart
 async function initChart() {
-  console.log('Starting chart initialization...');
-  
   try {
-    console.log('Loading CSV files...');
-    // Load both CSV files
+    Chart.defaults.font.family = "'Noto Sans', 'Google Sans', sans-serif";
+    Chart.defaults.font.size = 12;
+    Chart.defaults.color = '#64748b';
+
     const baselineData = await loadCSV('static/graphs/frechet_loss/tensorboard_logs_version_180.csv');
     const midiffData = await loadCSV('static/graphs/frechet_loss/tensorboard_logs_version_181.csv');
-    
-    console.log('Baseline data:', baselineData.length, 'points');
-    console.log('MiDiff data:', midiffData.length, 'points');
 
     const chartElement = document.getElementById('frechetChart');
-    console.log('Chart element found:', chartElement);
-    
-    if (!chartElement) {
-      console.error('Chart element not found!');
-      return;
-    }
+    if (!chartElement) return;
 
     const ctx = chartElement.getContext('2d');
-    console.log('Canvas context:', ctx);
-    
     const STEPS_PER_EPOCH = 1102;
+
+    const axisTitleFont = { size: 12, weight: '600' };
+    const gridColor = 'rgba(148, 163, 184, 0.28)';
+    const tickStyle = { color: '#64748b', font: { size: 11 } };
+
     window.frechetChart = new Chart(ctx, {
       type: 'line',
       data: {
@@ -1644,68 +1702,128 @@ async function initChart() {
             x: (row.Step / STEPS_PER_EPOCH) - 1,
             y: row.Value
           })),
-          borderColor: 'rgb(255, 99, 132)',
-          backgroundColor: 'rgba(255, 99, 132, 0.2)',
-          borderWidth: 2,
-          pointRadius: 4,
-          pointHoverRadius: 6
+          fill: true,
+          borderColor: '#e11d48',
+          backgroundColor: fadDatasetFill('225, 29, 72'),
+          borderWidth: 2.5,
+          tension: 0.35,
+          cubicInterpolationMode: 'monotone',
+          pointRadius: 0,
+          pointHoverRadius: 6,
+          pointHoverBorderWidth: 2,
+          pointHoverBackgroundColor: '#ffffff',
+          pointHoverBorderColor: '#e11d48'
         }, {
           label: 'MiDiff (MIDI-conditioned)',
           data: midiffData.map(row => ({
             x: (row.Step / STEPS_PER_EPOCH) - 1,
             y: row.Value
           })),
-          borderColor: 'rgb(54, 162, 235)',
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-          borderWidth: 2,
-          pointRadius: 4,
-          pointHoverRadius: 6
+          fill: true,
+          borderColor: '#0284c7',
+          backgroundColor: fadDatasetFill('14, 165, 233'),
+          borderWidth: 2.5,
+          tension: 0.35,
+          cubicInterpolationMode: 'monotone',
+          pointRadius: 0,
+          pointHoverRadius: 6,
+          pointHoverBorderWidth: 2,
+          pointHoverBackgroundColor: '#ffffff',
+          pointHoverBorderColor: '#0284c7'
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: {
+          duration: 750,
+          easing: 'easeOutQuart'
+        },
+        layout: {
+          padding: { top: 36, left: 4, right: 12, bottom: 4 }
+        },
         scales: {
           x: {
             type: 'linear',
             min: 0,
             max: 60,
-            title: {
-              display: true,
-              text: 'Epoch'
+            grid: {
+              color: gridColor,
+              tickLength: 0,
+              borderColor: 'transparent'
             },
+            border: { display: false },
             ticks: {
+              ...tickStyle,
               callback: (value) => {
-                // Prefer near-integers; otherwise show one decimal
                 const rounded = Math.round(value);
                 return Math.abs(value - rounded) < 0.05 ? String(rounded) : value.toFixed(1);
               }
+            },
+            title: {
+              display: true,
+              text: 'Training epoch',
+              color: '#334155',
+              font: axisTitleFont,
+              padding: { top: 10 }
             }
           },
           y: {
             type: 'logarithmic',
+            grid: {
+              color: gridColor,
+              tickLength: 0,
+              borderColor: 'transparent'
+            },
+            border: { display: false },
+            ticks: tickStyle,
             title: {
               display: true,
-              text: 'FAD (validation)'
+              text: 'FAD (validation)',
+              color: '#334155',
+              font: axisTitleFont,
+              padding: { bottom: 8 }
             }
           }
         },
         plugins: {
           title: {
             display: true,
-            text: 'Fréchet Audio Distance during training'
+            text: 'Fréchet Audio Distance vs. epoch',
+            color: '#0f172a',
+            font: { size: 15, weight: '600', family: Chart.defaults.font.family },
+            padding: { bottom: 6, top: 2 }
           },
           legend: {
             display: true,
-            position: 'top'
+            position: 'top',
+            align: 'start',
+            labels: {
+              color: '#475569',
+              padding: 18,
+              boxWidth: 36,
+              boxHeight: 3,
+              font: { size: 12, weight: '500' }
+            }
           },
           tooltip: {
-            mode: 'point',
+            mode: 'nearest',
             intersect: false,
+            backgroundColor: 'rgba(255, 255, 255, 0.96)',
+            titleColor: '#0f172a',
+            bodyColor: '#475569',
+            borderColor: 'rgba(148, 163, 184, 0.55)',
+            borderWidth: 1,
+            cornerRadius: 10,
+            padding: 12,
+            displayColors: true,
+            boxPadding: 6,
             callbacks: {
-              label: function(context) {
-                const epoch = context.parsed.x;
-                return `${context.dataset.label}: ${context.parsed.y.toFixed(4)} (Epoch: ${epoch.toFixed(0)})`;
+              title: (items) => (items.length ? `Epoch ${items[0].parsed.x.toFixed(1)}` : ''),
+              label(ctx) {
+                const y = ctx.parsed.y;
+                const v = typeof y === 'number' && !Number.isNaN(y) ? y.toFixed(4) : String(y);
+                return ` ${ctx.dataset.label}: ${v}`;
               }
             }
           }
@@ -1717,12 +1835,15 @@ async function initChart() {
         }
       }
     });
-    
-    console.log('Chart created successfully:', window.frechetChart);
   } catch (error) {
     console.error('Error loading chart data:', error);
-    document.getElementById('frechetChart').parentElement.innerHTML = 
-      '<p style="text-align: center; color: red;">Error loading chart data: ' + error.message + '</p>';
+    const mount = document.getElementById('frechet-chart-mount');
+    if (mount) {
+      mount.innerHTML =
+        '<p style="text-align:center;color:#be123c;padding:2rem;font-size:0.95rem;">Could not load training curves. ' +
+        error.message +
+        '</p>';
+    }
   }
 }
 
@@ -1752,51 +1873,105 @@ document.addEventListener('DOMContentLoaded', function() {
   const randomVel =     [null,   null,   1.7646,                   null, null,  null,  null,  null,  null,  null,   null];
   const constantVel =   [null,   null,   null,                     15.05, 14.93, 1.45, 0.62, 0.62, 0.62, 0.62, 0.62];
 
+  Chart.defaults.font.family = "'Noto Sans', 'Google Sans', sans-serif";
+
   const ctx = canvas.getContext('2d');
   new Chart(ctx, {
     type: 'bar',
     data: {
       labels,
       datasets: [
-        { label: 'Baseline (No MIDI)', data: baseline, backgroundColor: 'rgba(231, 76, 60, 0.85)' },
-        { label: 'MiDiff', data: midiff, backgroundColor: 'rgba(39, 174, 96, 0.85)' },
-        { label: 'MiDiff (Random Velocity)', data: randomVel, backgroundColor: 'rgba(230, 126, 34, 0.85)' },
-        { label: 'MiDiff (Constant Velocity)', data: constantVel, backgroundColor: 'rgba(52, 152, 219, 0.85)' }
+        { label: 'Baseline (No MIDI)', data: baseline, backgroundColor: 'rgba(225, 29, 72, 0.82)', borderColor: 'rgba(225, 29, 72, 1)', borderWidth: 0 },
+        { label: 'MiDiff', data: midiff, backgroundColor: 'rgba(5, 150, 105, 0.82)', borderColor: 'rgba(5, 150, 105, 1)', borderWidth: 0 },
+        { label: 'MiDiff (Random Velocity)', data: randomVel, backgroundColor: 'rgba(217, 119, 6, 0.82)', borderColor: 'rgba(217, 119, 6, 1)', borderWidth: 0 },
+        { label: 'MiDiff (Constant Velocity)', data: constantVel, backgroundColor: 'rgba(2, 132, 199, 0.82)', borderColor: 'rgba(2, 132, 199, 1)', borderWidth: 0 }
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: { duration: 650, easing: 'easeOutQuart' },
+      datasets: {
+        bar: {
+          borderRadius: 10,
+          borderSkipped: false
+        }
+      },
+      layout: { padding: { top: 8, right: 4, left: 4, bottom: 4 } },
       scales: {
         x: {
-          title: { display: true, text: 'Velocity Configuration' },
-          ticks: { 
-            minRotation: 45, 
+          title: {
+            display: true,
+            text: 'Velocity configuration',
+            color: '#334155',
+            font: { size: 12, weight: '600' },
+            padding: { top: 12 }
+          },
+          ticks: {
+            minRotation: 45,
             maxRotation: 45,
             autoSkip: false,
             maxTicksLimit: 20,
-            padding: 5
+            padding: 6,
+            color: '#64748b',
+            font: { size: 10 }
           },
-          grid: { display: false },
-          offset: true
+          grid: { display: false, drawBorder: false },
+          offset: true,
+          border: { display: false }
         },
         y: {
           type: 'logarithmic',
           min: 0.1,
           max: 20,
-          title: { display: true, text: 'FAD Score (↓ lower is better, log scale)' },
-          grid: { borderDash: [4, 4] }
+          title: {
+            display: true,
+            text: 'FAD (↓ lower is better, log scale)',
+            color: '#334155',
+            font: { size: 12, weight: '600' },
+            padding: { bottom: 8 }
+          },
+          ticks: { color: '#64748b', font: { size: 11 } },
+          grid: {
+            color: 'rgba(148, 163, 184, 0.28)',
+            tickLength: 0,
+            borderDash: [5, 5],
+            drawBorder: false
+          },
+          border: { display: false }
         }
       },
       plugins: {
-        legend: { position: 'right' },
-        title: { display: true, text: 'Velocity Ablation: FAD Score' },
+        legend: {
+          position: 'right',
+          labels: {
+            color: '#475569',
+            padding: 14,
+            font: { size: 11, weight: '500' },
+            usePointStyle: true,
+            pointStyle: 'rectRounded'
+          }
+        },
+        title: {
+          display: true,
+          text: 'Velocity ablation (FAD)',
+          color: '#0f172a',
+          font: { size: 15, weight: '600' },
+          padding: { bottom: 8 }
+        },
         tooltip: {
+          filter: (item) => item.parsed.y != null && !Number.isNaN(item.parsed.y),
+          backgroundColor: 'rgba(255, 255, 255, 0.96)',
+          titleColor: '#0f172a',
+          bodyColor: '#475569',
+          borderColor: 'rgba(148, 163, 184, 0.55)',
+          borderWidth: 1,
+          cornerRadius: 10,
+          padding: 12,
           callbacks: {
-            label: function(ctx) {
+            label(ctx) {
               const v = ctx.parsed.y;
-              if (v == null) return null;
-              return `${ctx.dataset.label}: ${v.toFixed(4)}`;
+              return ` ${ctx.dataset.label}: ${v.toFixed(4)}`;
             }
           }
         }
