@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="MiDiff  drum audio, MIDI conditioning, diffusion enhancement">
+  <defs>
+    <linearGradient id="logoBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#312e81"/>
+    </linearGradient>
+    <linearGradient id="logoRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#64748b"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+    <linearGradient id="midiStrip" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="waveClean" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fb923c"/>
+      <stop offset="35%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+    <filter id="logoSoft" x="-8%" y="-8%" width="116%" height="116%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#020617" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Card -->
+  <rect width="128" height="128" rx="28" fill="url(#logoBg)"/>
+  <rect x="3" y="3" width="122" height="122" rx="25" fill="none" stroke="url(#logoRing)" stroke-width="2.5" opacity="0.85"/>
+
+  <!-- Drum head (symbolic: acoustic drum shell) -->
+  <g filter="url(#logoSoft)">
+    <ellipse cx="52" cy="58" rx="34" ry="28" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+    <ellipse cx="52" cy="56" rx="30" ry="24" fill="#334155"/>
+    <ellipse cx="52" cy="54" rx="26" ry="20" fill="#475569" opacity="0.9"/>
+    <!-- Drum rim highlight -->
+    <ellipse cx="52" cy="48" rx="22" ry="8" fill="#ffffff" opacity="0.08"/>
+  </g>
+
+  <!-- MIDI conditioning strip (symbolic piano-roll / hits) -->
+  <g opacity="0.95">
+    <rect x="78" y="28" width="36" height="14" rx="3" fill="#0f172a" stroke="#22d3ee" stroke-width="1" stroke-opacity="0.5"/>
+    <rect x="81" y="38" width="3.5" height="6" rx="0.8" fill="url(#midiStrip)"/>
+    <rect x="86" y="34" width="3.5" height="10" rx="0.8" fill="url(#midiStrip)" opacity="0.95"/>
+    <rect x="91" y="36" width="3.5" height="8" rx="0.8" fill="url(#midiStrip)" opacity="0.9"/>
+    <rect x="96" y="32" width="3.5" height="12" rx="0.8" fill="url(#midiStrip)"/>
+    <rect x="101" y="35" width="3.5" height="9" rx="0.8" fill="url(#midiStrip)" opacity="0.85"/>
+    <rect x="106" y="37" width="3.5" height="7" rx="0.8" fill="url(#midiStrip)" opacity="0.8"/>
+  </g>
+
+  <!-- Noisy ’ enhanced waveform across the drum (enhancement story) -->
+  <path
+    d="M 18 88 Q 28 62 38 72 Q 48 82 58 70 Q 72 52 88 58 Q 98 62 108 56"
+    fill="none"
+    stroke="url(#waveClean)"
+    stroke-width="3.5"
+    stroke-linecap="round"
+    opacity="0.95"/>
+  <path
+    d="M 18 92 Q 30 78 42 84 Q 54 90 66 82 Q 82 72 96 76 Q 106 78 112 74"
+    fill="none"
+    stroke="#94a3b8"
+    stroke-width="2"
+    stroke-linecap="round"
+    opacity="0.35"/>
+
+  <!-- Small diffusion spark -->
+  <circle cx="98" cy="102" r="4" fill="#fbbf24" opacity="0.9"/>
+  <circle cx="106" cy="96" r="2.5" fill="#e2e8f0" opacity="0.8"/>
+</svg>
